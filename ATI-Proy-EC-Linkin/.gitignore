@@ -1,0 +1,98 @@
+# Entorno virtual y dependencias
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.codes
+*.egg
+MANIFEST
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# PyCharm
+.idea/
+.idea/*.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+*.iws
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Archivos de sistema
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Archivos de configuración sensible
+*.pem
+*.key
+*.crt
+secrets.json
+config_local.py
+
+# Archivos temporales
+*.swp
+*.swo
+*~
+\#*
+.\#*
+
+# Migraciones (opcional - discutible)
+# !/apps/*/migrations/
+# /apps/*/migrations/*.py
+# !/apps/*/migrations/__init__.py
+
+# Docker
+docker-compose.override.yml
+
+# Entornos
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/

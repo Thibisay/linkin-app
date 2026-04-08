@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Buscar Empleos" %} - Linking X{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-jobs-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .search-layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+    }
+    
+    /* Sidebar Filters */
+    .filters-sidebar {
+        position: sticky;
+        top: 80px;
+        height: fit-content;
+    }
+    
+    .filters-card {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .filters-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .filter-input:focus {
+        outline: none;
+        border-color: #0A66C2;
+        box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
+    }
+    
+    .filter-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+    }
+    
+    .btn-apply-filters {
+        width: 100%;
+        padding: 0.75rem;
+        background: #0A66C2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+    
+    .btn-apply-filters:hover {
+        background: #004182;
+    }
+    
+    .btn-clear-filters {
+        width: 100%;
+        padding: 0.75rem;
+        background: white;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 0.5rem;
+    }
+    
+    /* Results Area */
+    .results-area {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        padding: 1.5rem;
+    }
+    
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .results-count {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .sort-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    /* Job Card */
+    .job-result-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .job-result-card:hover {
+        border-color: #0A66C2;
+        box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15);
+    }
+    
+    .job-card-header {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .job-company-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .job-card-info {
+        flex: 1;
+    }
+    
+    .job-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+    }
+    
+    .job-card-title:hover {
+        color: #0A66C2;
+    }
+    
+    .job-card-company {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+    
+    .job-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 13px;
+        color: #6b7280;
+    }
+    
+    .job-card-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .job-card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .job-tag {
+        padding: 0.25rem 0.75rem;
+        background: #f3f4f6;
+        color: #374151;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .job-tag.highlighted {
+        background: #E7F3FF;
+        color: #0A66C2;
+    }
+    
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+    
+    .page-link {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        color: #374151;
+        text-decoration: none;
+    }
+    
+    .page-link:hover {
+        background: #f3f4f6;
+    }
+    
+    .page-link.active {
+        background: #0A66C2;
+        color: white;
+        border-color: #0A66C2;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+    
+    /* Responsive */
+    @media (max-width: 991px) {
+        .search-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .filters-sidebar {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-jobs-container">
+    <div class="search-layout">
+        
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+            <div class="filters-card">
+                <h2 class="filters-title">{% trans "Filtros" %}</h2>
+                
+                <form method="get" action="{% url 'search_jobs' %}">
+                    
+                    <!-- Búsqueda por palabra clave -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Palabra clave" %}</label>
+                        <input 
+                            type="text" 
+                            name="q" 
+                            class="filter-input" 
+                            placeholder="{% trans 'Python, Django, Backend...' %}"
+                            value="{{ filter.form.q.value|default:'' }}"
+                        >
+                    </div>
+                    
+                    <!-- Ubicación -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Ubicación" %}</label>
+                        <input 
+                            type="text" 
+                            name="ubicacion" 
+                            class="filter-input" 
+                            placeholder="{% trans 'Ciudad o país' %}"
+                            value="{{ filter.form.ubicacion.value|default:'' }}"
+                        >
+                    </div>
+                    
+                    <!-- Tipo de empleo -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Tipo de empleo" %}</label>
+                        <select name="tipo_empleo" class="filter-select">
+                            <option value="">{% trans "Todos" %}</option>
+                            {% for value, label in filter.form.tipo_empleo.field.choices %}
+                                <option value="{{ value }}" {% if filter.form.tipo_empleo.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Modalidad -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Modalidad" %}</label>
+                        <select name="modalidad" class="filter-select">
+                            <option value="">{% trans "Todas" %}</option>
+                            {% for value, label in filter.form.modalidad.field.choices %}
+                                <option value="{{ value }}" {% if filter.form.modalidad.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Nivel -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Nivel" %}</label>
+                        <select name="nivel" class="filter-select">
+                            <option value="">{% trans "Todos" %}</option>
+                            {% for value, label in filter.form.nivel.field.choices %}
+                                <option value="{{ value }}" {% if filter.form.nivel.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Salario mínimo -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Salario mínimo" %}</label>
+                        <input 
+                            type="number" 
+                            name="salario_min" 
+                            class="filter-input" 
+                            placeholder="{% trans 'Ej: 50000' %}"
+                            value="{{ filter.form.salario_min.value|default:'' }}"
+                        >
+                    </div>
+                    
+                    <button type="submit" class="btn-apply-filters">
+                        <i class="bi bi-search me-2"></i>
+                        {% trans "Aplicar filtros" %}
+                    </button>
+                    
+                    <a href="{% url 'search_jobs' %}" class="btn-clear-filters" style="text-decoration: none; display: block; text-align: center;">
+                        {% trans "Limpiar filtros" %}
+                    </a>
+                    
+                </form>
+            </div>
+        </aside>
+        
+        <!-- Results Area -->
+        <main class="results-area">
+            
+            <div class="results-header">
+                <div class="results-count">
+                    {{ total_results }} {% trans "empleos encontrados" %}
+                </div>
+                <select class="sort-select" onchange="window.location.href='?sort=' + this.value">
+                    <option value="recent">{% trans "Más recientes" %}</option>
+                    <option value="relevant">{% trans "Más relevantes" %}</option>
+                    <option value="salary">{% trans "Mayor salario" %}</option>
+                </select>
+            </div>
+            
+            <!-- Job Cards -->
+            {% for oferta in ofertas %}
+            <a href="{% url 'job_detail' oferta.id %}" class="job-result-card" style="text-decoration: none; color: inherit; display: block;">
+                <div class="job-card-header">
+                    <img src="{{ oferta.empresa.user.get_avatar_url }}" alt="Logo" class="job-company-logo">
+                    <div class="job-card-info">
+                        <h3 class="job-card-title">{{ oferta.titulo }}</h3>
+                        <div class="job-card-company">{{ oferta.empresa.nombre_empresa }}</div>
+                        <div class="job-card-meta">
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-geo-alt"></i> {{ oferta.ubicacion }}
+                            </span>
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-briefcase"></i> {{ oferta.get_tipo_empleo_display }}
+                            </span>
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-laptop"></i> {{ oferta.get_modalidad_display }}
+                            </span>
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-clock"></i> {{ oferta.fecha_publicacion|timesince }} {% trans "atrás" %}
+                            </span>
+                        </div>
+                        <div class="job-card-tags">
+                            <span class="job-tag highlighted">{{ oferta.get_nivel_display }}</span>
+                            {% if oferta.salario_min and oferta.mostrar_salario %}
+                            <span class="job-tag">${{ oferta.salario_min|floatformat:0 }} - ${{ oferta.salario_max|floatformat:0 }}</span>
+                            {% endif %}
+                            <span class="job-tag">{{ oferta.get_modalidad_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-state">
+                <i class="bi bi-inbox" style="font-size: 64px;"></i>
+                <h3>{% trans "No se encontraron empleos" %}</h3>
+                <p>{% trans "Intenta ajustar los filtros o busca algo diferente" %}</p>
+            </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if ofertas.has_other_pages %}
+            <div class="pagination">
+                {% if ofertas.has_previous %}
+                <a href="?page={{ ofertas.previous_page_number }}&{{ request.GET.urlencode }}" class="page-link">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                {% endif %}
+                
+                {% for num in ofertas.paginator.page_range %}
+                    {% if ofertas.number == num %}
+                    <span class="page-link active">{{ num }}</span>
+                    {% elif num > ofertas.number|add:'-3' and num < ofertas.number|add:'3' %}
+                    <a href="?page={{ num }}&{{ request.GET.urlencode }}" class="page-link">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if ofertas.has_next %}
+                <a href="?page={{ ofertas.next_page_number }}&{{ request.GET.urlencode }}" class="page-link">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+        </main>
+        
+    </div>
+</div>
+{% endblock %}

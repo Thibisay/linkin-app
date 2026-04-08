@@ -1,0 +1,540 @@
+/* ============================================================
+   LINKING X — profile.css
+   Estilos para profesional_detail.html y empresa_detail.html.
+   Extraídos del <style> inline original sin cambiar clases.
+   ============================================================ */
+
+
+/* ========== CONTENEDOR ========== */
+
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+
+/* ========== HEADER CARD ========== */
+
+.profile-header-card {
+    background: var(--bg-card, white);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.cover-photo {
+    height: 200px;
+    background: linear-gradient(135deg, #0A66C2 0%, #004182 100%);
+}
+
+.profile-header-content {
+    padding: 0 1.5rem 1.5rem;
+    position: relative;
+}
+
+.profile-avatar-section {
+    margin-top: -80px;
+    margin-bottom: 1rem;
+}
+
+/* Avatar circular (profesional) */
+.profile-avatar {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    border: 4px solid var(--bg-card, white);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    object-fit: cover;
+    background: var(--bg-card, white);
+}
+
+/* Avatar cuadrado redondeado (empresa) — sobrescribe el radio */
+.profile-avatar--square {
+    border-radius: 8px;
+}
+
+.profile-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary, #111827);
+    margin-bottom: 0.25rem;
+}
+
+.profile-title {
+    font-size: 18px;
+    color: var(--text-primary, #374151);
+    margin-bottom: 0.5rem;
+}
+
+.profile-location {
+    font-size: 14px;
+    color: var(--text-secondary, #6b7280);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+
+/* ========== STATS CARD ========== */
+
+.profile-stats-card {
+    background: var(--bg-card, white);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary, #111827);
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-secondary, #6b7280);
+    margin-top: 0.25rem;
+}
+
+
+/* ========== LAYOUT DOS COLUMNAS ========== */
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 1.5rem;
+}
+
+@media (max-width: 991px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ========== SECTION CARD ========== */
+
+.section-card {
+    background: var(--bg-card, white);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary, #111827);
+}
+
+.section-action {
+    color: #0A66C2;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.section-action:hover {
+    color: #004182;
+}
+
+
+/* ========== ABOUT ========== */
+
+.about-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-primary, #374151);
+    white-space: pre-wrap;
+}
+
+
+/* ========== TIMELINE (experiencia / educación) ========== */
+
+.timeline-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color, #f3f4f6);
+}
+
+.timeline-item:last-child {
+    border-bottom: none;
+}
+
+.timeline-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-body, #f3f4f6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.timeline-icon i {
+    font-size: 24px;
+    color: var(--text-secondary, #6b7280);
+}
+
+.timeline-content {
+    flex: 1;
+}
+
+.timeline-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary, #111827);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary, #6b7280);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-date {
+    font-size: 13px;
+    color: var(--text-secondary, #9ca3af);
+}
+
+.timeline-description {
+    font-size: 14px;
+    color: var(--text-primary, #374151);
+    margin-top: 0.5rem;
+    line-height: 1.5;
+}
+
+
+/* ========== SKILLS ========== */
+
+.skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.skill-badge {
+    padding: 0.5rem 1rem;
+    background: var(--bg-body, #f3f4f6);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #374151);
+}
+
+
+/* ========== CONTACT INFO ========== */
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color, #f3f4f6);
+}
+
+.contact-item:last-child {
+    border-bottom: none;
+}
+
+.contact-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-body, #f3f4f6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contact-icon i {
+    font-size: 18px;
+    color: var(--text-secondary, #6b7280);
+}
+
+.contact-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-label {
+    font-size: 12px;
+    color: var(--text-secondary, #9ca3af);
+}
+
+.contact-value {
+    font-size: 14px;
+    color: var(--text-primary, #374151);
+    font-weight: 500;
+    word-break: break-word;
+    text-decoration: none;
+    display: block;
+}
+
+.contact-value a,
+a.contact-value {
+    color: #0A66C2;
+    text-decoration: none;
+}
+
+.contact-value a:hover,
+a.contact-value:hover {
+    text-decoration: underline;
+}
+
+
+/* ========== COMPANY INFO GRID (empresa_detail) ========== */
+
+.company-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.info-label {
+    font-size: 13px;
+    color: var(--text-secondary, #9ca3af);
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 15px;
+    color: var(--text-primary, #111827);
+    font-weight: 600;
+}
+
+.info-value a {
+    color: #0A66C2;
+    text-decoration: none;
+}
+
+.info-value a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+    .company-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ========== JOB ITEM (empresa_detail) ========== */
+
+.job-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color, #f3f4f6);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+}
+
+.job-item:last-child {
+    border-bottom: none;
+}
+
+.job-item:hover {
+    background: var(--bg-body, #f9fafb);
+    margin: 0 -1rem;
+    padding: 1rem 1rem;
+    border-radius: 8px;
+    color: inherit;
+}
+
+.job-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-body, #f3f4f6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.job-icon i {
+    font-size: 24px;
+    color: #0A66C2;
+}
+
+.job-content {
+    flex: 1;
+}
+
+.job-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary, #111827);
+    margin-bottom: 0.25rem;
+}
+
+.job-item:hover .job-title {
+    color: #0A66C2;
+}
+
+.job-meta {
+    font-size: 13px;
+    color: var(--text-secondary, #6b7280);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.job-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    background: #E7F3FF;
+    color: #0A66C2;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+
+/* ========== AD CARD ========== */
+
+.ad-card {
+    background: var(--bg-card, white);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.ad-label {
+    font-size: 12px;
+    color: var(--text-secondary, #9ca3af);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.ad-content {
+    text-align: center;
+}
+
+.ad-placeholder {
+    width: 100%;
+    height: 120px;
+    background: var(--bg-body, #f3f4f6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.ad-placeholder span {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--border-color, #d1d5db);
+}
+
+.ad-text {
+    font-size: 14px;
+    color: var(--text-secondary, #6b7280);
+    margin-bottom: 1rem;
+}
+
+
+/* ========== BUTTONS (usados en los perfiles) ========== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #0A66C2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #004182;
+    color: white;
+}
+
+.btn-primary.following {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-primary.following:hover {
+    background: #EF4444;
+    color: white;
+}
+
+.btn-secondary {
+    background: var(--bg-card, white);
+    color: var(--text-primary, #374151);
+    border: 1px solid var(--border-color, #d1d5db);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-body, #f9fafb);
+    border-color: var(--text-secondary, #9ca3af);
+    color: var(--text-primary, #374151);
+}
+
+.btn-block {
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 13px;
+}

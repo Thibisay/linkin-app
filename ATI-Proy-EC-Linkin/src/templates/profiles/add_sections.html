@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+    {% if action == 'add' %}
+        {% trans "Agregar" %} 
+    {% else %}
+        {% trans "Editar" %}
+    {% endif %}
+    {% if section == 'habilidades' %}
+        {% trans "Habilidad" %}
+    {% elif section == 'educacion' %}
+        {% trans "Educación" %}
+    {% elif section == 'experiencia' %}
+        {% trans "Experiencia" %}
+    {% endif %}
+    - Linking X
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+<style>
+    .modal-container {
+        min-height: calc(100vh - var(--header-height));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6) var(--space-4);
+        padding-bottom: calc(var(--nav-height) + var(--space-6));
+    }
+    
+    .modal-card {
+        background: var(--color-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-xl);
+        width: 100%;
+        max-width: 600px;
+        padding: var(--space-8);
+    }
+    
+    .modal-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-6);
+    }
+    
+    .modal-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--color-primary-100);
+        color: var(--color-primary-700);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-3);
+        background: var(--color-gray-100);
+        border-radius: var(--radius-md);
+    }
+    
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    
+    .checkbox-wrapper label {
+        margin: 0;
+        cursor: pointer;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block main_attrs %}class="modal-container"{% endblock %}
+
+{% block content %}
+<div class="modal-card">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <div class="modal-icon">
+            {% if section == 'habilidades' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+            </svg>
+            {% elif section == 'educacion' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+            </svg>
+            {% elif section == 'experiencia' %}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+            </svg>
+            {% endif %}
+        </div>
+        
+        <div>
+            <h1 class="h2" style="margin: 0;">
+                {% if action == 'add' %}
+                    {% trans "Agregar" %} 
+                {% else %}
+                    {% trans "Editar" %}
+                {% endif %}
+                {% if section == 'habilidades' %}
+                    {% trans "habilidad" %}
+                {% elif section == 'educacion' %}
+                    {% trans "educación" %}
+                {% elif section == 'experiencia' %}
+                    {% trans "experiencia" %}
+                {% endif %}
+            </h1>
+            <p style="font-size: 14px; color: var(--color-gray-600); margin: var(--space-1) 0 0 0;">
+                {% trans "Completa los campos requeridos" %}
+            </p>
+        </div>
+    </div>
+    
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="form-group">
+            {% if field.field.widget.input_type == 'checkbox' %}
+                <!-- Checkbox Field -->
+                <div class="checkbox-wrapper">
+                    {{ field }}
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                </div>
+            {% else %}
+                <!-- Regular Fields -->
+                <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }}
+                    {% if field.field.required %}*{% endif %}
+                </label>
+                
+                <div class="form-input-wrapper {% if field.errors %}error{% endif %}">
+                    {{ field }}
+                </div>
+                
+                {% if field.errors %}
+                    <span class="form-error" role="alert">{{ field.errors.0 }}</span>
+                {% endif %}
+                
+                {% if field.help_text %}
+                    <span class="form-helper">{{ field.help_text }}</span>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <!-- Action Buttons -->
+        <div class="form-actions" style="margin-top: var(--space-6);">
+            <a href="{% url 'profile_detail' request.user.id %}" class="btn btn-secondary">
+                {% trans "Cancelar" %}
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                {% if action == 'add' %}
+                    {% trans "Agregar" %}
+                {% else %}
+                    {% trans "Guardar cambios" %}
+                {% endif %}
+            </button>
+        </div>
+        
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-hide end date when "currently working/studying" is checked
+document.addEventListener('DOMContentLoaded', function() {
+    const enCursoCheckbox = document.querySelector('input[name="en_curso"]');
+    const trabajoActualCheckbox = document.querySelector('input[name="trabajo_actual"]');
+    
+    const fechaFinWrapper = document.querySelector('input[name="fecha_fin"]')?.closest('.form-group');
+    
+    function toggleEndDate(checkbox) {
+        if (checkbox && fechaFinWrapper) {
+            if (checkbox.checked) {
+                fechaFinWrapper.style.display = 'none';
+                document.querySelector('input[name="fecha_fin"]').required = false;
+            } else {
+                fechaFinWrapper.style.display = 'block';
+            }
+        }
+    }
+    
+    if (enCursoCheckbox) {
+        toggleEndDate(enCursoCheckbox);
+        enCursoCheckbox.addEventListener('change', function() {
+            toggleEndDate(this);
+        });
+    }
+    
+    if (trabajoActualCheckbox) {
+        toggleEndDate(trabajoActualCheckbox);
+        trabajoActualCheckbox.addEventListener('change', function() {
+            toggleEndDate(this);
+        });
+    }
+});
+</script>
+{% endblock %}

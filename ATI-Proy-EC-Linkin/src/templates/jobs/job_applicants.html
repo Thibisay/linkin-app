@@ -1,0 +1,742 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Postulantes" %} - {{ oferta.titulo }} - Linking X{% endblock %}
+
+{% block extra_css %}
+<style>
+    .applicants-container {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #f9fafb;
+    }
+    
+    .applicants-layout {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        height: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    /* Left Column - Applicants List */
+    .applicants-sidebar {
+        background: white;
+        border-right: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .applicants-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #0A66C2;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 1rem;
+    }
+    
+    .back-button:hover {
+        color: #004182;
+    }
+    
+    .job-title-header {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .applicants-count {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    
+    .search-bar {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 20px;
+        font-size: 14px;
+        background: #f9fafb;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #0A66C2;
+        background: white;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 2.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .filter-tabs {
+        display: flex;
+        padding: 0 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .filter-tab {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #6b7280;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .filter-tab.active {
+        color: #0A66C2;
+        border-bottom-color: #0A66C2;
+    }
+    
+    .applicants-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+    
+    .applicant-item {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+    }
+    
+    .applicant-item:hover {
+        background: #f9fafb;
+    }
+    
+    .applicant-item.active {
+        background: #E7F3FF;
+        border-left: 3px solid #0A66C2;
+    }
+    
+    .applicant-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    
+    .applicant-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .applicant-name {
+        font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .applicant-title {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .applicant-meta {
+        display: flex;
+        gap: 0.75rem;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-badge.pending {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .status-badge.reviewing {
+        background: #DBEAFE;
+        color: #1E40AF;
+    }
+    
+    .status-badge.accepted {
+        background: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .status-badge.rejected {
+        background: #FEE2E2;
+        color: #991B1B;
+    }
+    
+    /* Right Column - Applicant Detail */
+    .applicant-detail {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 2rem;
+        gap: 1.5rem;
+    }
+    
+    .detail-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        padding: 2rem;
+    }
+    
+    .applicant-header-detail {
+        display: flex;
+        gap: 1.5rem;
+        align-items: start;
+        margin-bottom: 1.5rem;
+    }
+    
+    .avatar-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .applicant-header-info {
+        flex: 1;
+    }
+    
+    .applicant-name-large {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .applicant-subtitle {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .btn-accept {
+        flex: 1;
+        background: #10B981;
+        color: white;
+        border: none;
+    }
+    
+    .btn-accept:hover {
+        background: #059669;
+    }
+    
+    .btn-reject {
+        flex: 1;
+        background: #EF4444;
+        color: white;
+        border: none;
+    }
+    
+    .btn-reject:hover {
+        background: #DC2626;
+    }
+    
+    .btn-message {
+        background: white;
+        color: #0A66C2;
+        border: 1px solid #0A66C2;
+    }
+    
+    .btn-message:hover {
+        background: #E7F3FF;
+    }
+    
+    .detail-section {
+        margin-bottom: 2rem;
+    }
+    
+    .detail-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .detail-section-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .detail-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .detail-value {
+        font-size: 15px;
+        color: #111827;
+    }
+    
+    .skills-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .skill-chip {
+        background: #E7F3FF;
+        color: #0A66C2;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    
+    .resume-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        color: #0A66C2;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    
+    .resume-link:hover {
+        background: white;
+        border-color: #0A66C2;
+    }
+    
+    .other-jobs-section {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        padding: 1.5rem;
+    }
+    
+    .section-title-small {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .job-card-mini {
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    .job-card-mini:hover {
+        border-color: #0A66C2;
+        background: #f9fafb;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+    
+    .empty-state i {
+        font-size: 64px;
+        margin-bottom: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 991px) {
+        .applicants-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .applicant-detail {
+            display: none;
+        }
+        
+        .applicants-container.show-detail .applicants-sidebar {
+            display: none;
+        }
+        
+        .applicants-container.show-detail .applicant-detail {
+            display: flex;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="applicants-container">
+    <div class="applicants-layout">
+        
+        <!-- Left Sidebar - Applicants List -->
+        <aside class="applicants-sidebar">
+            
+            <!-- Header -->
+            <div class="applicants-header">
+                <a href="{% url 'job_detail' oferta.id %}" class="back-button">
+                    <i class="bi bi-arrow-left"></i>
+                    {% trans "Volver a la oferta" %}
+                </a>
+                <h1 class="job-title-header">{{ oferta.titulo }}</h1>
+                <p class="applicants-count">
+                    {{ postulaciones.count }} {% trans "postulante" %}{{ postulaciones.count|pluralize:"s" }}
+                </p>
+            </div>
+            <!-- Banner de Estado -->
+            {% if not oferta.activa %}
+            <div style="padding: 1rem 1.5rem; background: #FEF3C7; border-bottom: 1px solid #FDE68A; display: flex; align-items: center; gap: 1rem;">
+                <i class="bi bi-pause-circle" style="font-size: 20px; color: #92400E;"></i>
+                <div style="flex: 1;">
+                    <h4 style="margin: 0; font-size: 13px; font-weight: 600; color: #92400E;">
+                        {% trans "Oferta pausada" %}
+                    </h4>
+                    <p style="margin: 0; font-size: 12px; color: #78350F;">
+                        {% trans "No visible para profesionales" %}
+                    </p>
+                </div>
+                <form method="post" action="{% url 'toggle_job_status' oferta.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-success">
+                        <i class="bi bi-play-circle me-1"></i>
+                        {% trans "Activar" %}
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+            
+            <!-- Search -->
+            <div class="search-bar position-relative">
+                <i class="bi bi-search search-icon"></i>
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    placeholder="{% trans 'Buscar postulantes...' %}"
+                    id="searchInput"
+                    onkeyup="filterApplicants()"
+                >
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <div class="filter-tab active" data-filter="all" onclick="filterByStatus('all')">
+                    {% trans "Todos" %} ({{ postulaciones.count }})
+                </div>
+                <div class="filter-tab" data-filter="pendiente" onclick="filterByStatus('pendiente')">
+                    {% trans "Pendientes" %} ({{ postulaciones_pendientes.count }})
+                </div>
+                <div class="filter-tab" data-filter="aceptada" onclick="filterByStatus('aceptada')">
+                    {% trans "Aceptados" %} ({{ postulaciones_aceptadas.count }})
+                </div>
+            </div>
+            
+            <!-- Applicants List -->
+            <div class="applicants-list" id="applicantsList">
+                {% for postulacion in postulaciones %}
+                <div class="applicant-item {% if forloop.first %}active{% endif %}" 
+                     data-applicant-id="{{ postulacion.id }}"
+                     data-status="{{ postulacion.estado }}"
+                     onclick="showApplicantDetail('{{ postulacion.id }}')">
+                    <img 
+                        src="{{ postulacion.profesional.user.get_avatar_url }}" 
+                        alt="Avatar" 
+                        class="applicant-avatar"
+                    >
+                    <div class="applicant-info">
+                        <div class="applicant-name">{{ postulacion.profesional.user.get_full_name }}</div>
+                        <div class="applicant-title">{{ postulacion.profesional.titulo_actual|default:"Profesional" }}</div>
+                        <div class="applicant-meta">
+                            <span>{{ postulacion.anos_experiencia }} {% trans "años" %}</span>
+                            <span>•</span>
+                            <span>{{ postulacion.get_nivel_habilidad_display }}</span>
+                            <span>•</span>
+                            <span class="status-badge {{ postulacion.estado }}">
+                                {{ postulacion.get_estado_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h5>{% trans "Sin postulantes aún" %}</h5>
+                    <p>{% trans "Aún no has recibido aplicaciones para esta oferta" %}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+        </aside>
+        
+        <!-- Right Column - Applicant Detail -->
+        <main class="applicant-detail" id="applicantDetail">
+            
+            {% if postulaciones.first %}
+            {% with postulacion=postulaciones.first %}
+            
+            <!-- Applicant Profile Card -->
+            <div class="detail-card">
+                <div class="applicant-header-detail">
+                    <img 
+                        src="{{ postulacion.profesional.user.get_avatar_url }}" 
+                        alt="Avatar" 
+                        class="avatar-large"
+                    >
+                    <div class="applicant-header-info">
+                        <h2 class="applicant-name-large">{{ postulacion.profesional.user.get_full_name }}</h2>
+                        <p class="applicant-subtitle">{{ postulacion.profesional.titulo_actual|default:"Profesional" }}</p>
+                        
+                        <div class="action-buttons">
+                            {% if postulacion.estado == 'pendiente' or postulacion.estado == 'en_revision' %}
+                            <button class="btn btn-accept" onclick="updateApplicationStatus('{{ postulacion.id }}', 'aceptada')">
+                                <i class="bi bi-check-circle me-2"></i>
+                                {% trans "Aceptar" %}
+                            </button>
+                            <button class="btn btn-reject" onclick="updateApplicationStatus('{{ postulacion.id }}', 'rechazada')">
+                                <i class="bi bi-x-circle me-2"></i>
+                                {% trans "Rechazar" %}
+                            </button>
+                            {% endif %}
+                            
+                            <a href="{% url 'create_conversation' postulacion.profesional.user.id %}" class="btn btn-message">
+                                <i class="bi bi-chat me-2"></i>
+                                {% trans "Mensaje" %}
+                            </a>
+                            
+                            <a href="{% url 'profile_detail' postulacion.profesional.user.id %}" class="btn btn-secondary">
+                                <i class="bi bi-person me-2"></i>
+                                {% trans "Ver perfil" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Application Details -->
+                <div class="detail-section">
+                    <h3 class="detail-section-title">{% trans "Información de la aplicación" %}</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">{% trans "Años de experiencia" %}</span>
+                            <span class="detail-value">{{ postulacion.anos_experiencia }} {% trans "años" %}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">{% trans "Nivel de habilidad" %}</span>
+                            <span class="detail-value">{{ postulacion.get_nivel_habilidad_display }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">{% trans "Email" %}</span>
+                            <span class="detail-value">{{ postulacion.email_contacto }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">{% trans "Teléfono" %}</span>
+                            <span class="detail-value">{{ postulacion.telefono_contacto }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills -->
+                {% if postulacion.habilidades_tecnicas %}
+                <div class="detail-section">
+                    <h3 class="detail-section-title">{% trans "Habilidades técnicas" %}</h3>
+                    <div class="skills-list">
+                        {% for skill in postulacion.habilidades_list %}
+                            <span class="skill-chip">{{ skill }}</span>
+                        {% endfor %}
+                        
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Resume -->
+                {% if postulacion.curriculum %}
+                <div class="detail-section">
+                    <h3 class="detail-section-title">{% trans "Currículum" %}</h3>
+                    <a href="{{ postulacion.curriculum.url }}" target="_blank" class="resume-link">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        {% trans "Descargar CV" %}
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!-- Cover Letter -->
+                {% if postulacion.carta_presentacion %}
+                <div class="detail-section">
+                    <h3 class="detail-section-title">{% trans "Carta de presentación" %}</h3>
+                    <p class="detail-value">{{ postulacion.carta_presentacion }}</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% endwith %}
+            {% endif %}
+            
+            <!-- Other Jobs -->
+            <div class="other-jobs-section">
+                <h3 class="section-title-small">{% trans "Otras ofertas activas" %}</h3>
+                
+                {% for job in otras_ofertas %}
+                <a href="{% url 'job_applicants' job.id %}" class="job-card-mini">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="fw-semibold mb-1">{{ job.titulo }}</div>
+                            <div class="text-muted small">
+                                {{ job.postulaciones.count }} {% trans "postulante" %}{{ job.postulaciones.count|pluralize:"s" }}
+                            </div>
+                        </div>
+                        <span class="badge bg-primary">{{ job.get_nivel_display }}</span>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="text-muted small">{% trans "No hay otras ofertas activas" %}</p>
+                {% endfor %}
+            </div>
+            
+        </main>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterApplicants() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const applicants = document.querySelectorAll('.applicant-item');
+    
+    applicants.forEach(applicant => {
+        const name = applicant.querySelector('.applicant-name').textContent.toLowerCase();
+        const title = applicant.querySelector('.applicant-title').textContent.toLowerCase();
+        
+        if (name.includes(searchInput) || title.includes(searchInput)) {
+            applicant.style.display = 'flex';
+        } else {
+            applicant.style.display = 'none';
+        }
+    });
+}
+
+function filterByStatus(status) {
+    const tabs = document.querySelectorAll('.filter-tab');
+    const applicants = document.querySelectorAll('.applicant-item');
+    
+    // Update active tab
+    tabs.forEach(tab => {
+        if (tab.dataset.filter === status) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+    
+    // Filter applicants
+    applicants.forEach(applicant => {
+        if (status === 'all' || applicant.dataset.status === status) {
+            applicant.style.display = 'flex';
+        } else {
+            applicant.style.display = 'none';
+        }
+    });
+}
+
+function showApplicantDetail(applicantId) {
+    // Update active state
+    const applicants = document.querySelectorAll('.applicant-item');
+    applicants.forEach(item => {
+        if (item.dataset.applicantId == applicantId) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
+    // Load applicant details via AJAX (implement later)
+    // For now, just reload the page with the selected applicant
+    window.location.href = `?applicant=${applicantId}`;
+}
+
+function updateApplicationStatus(applicationId, newStatus) {
+    if (!confirm(`¿Estás seguro de que quieres ${newStatus === 'aceptada' ? 'aceptar' : 'rechazar'} esta aplicación?`)) {
+        return;
+    }
+    
+    fetch(`/jobs/application/${applicationId}/update-status/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ estado: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('{% trans "Error al actualizar el estado" %}');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{% trans "Error al actualizar el estado" %}');
+    });
+}
+</script>
+{% endblock %}

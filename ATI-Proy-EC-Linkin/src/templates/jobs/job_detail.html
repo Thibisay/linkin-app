@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{{ oferta.titulo }} - Linking X{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/jobs.css' %}">
+<style>
+    .job-header-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-save-job {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .btn-save-job.saved {
+        background: #E7F3FF;
+        color: #0A66C2;
+        border-color: #0A66C2;
+    }
+    
+    .btn-save-job.saved i {
+        color: #0A66C2;
+    }
+    
+    .modal-warning {
+        background: #FEF3C7;
+        border: 1px solid #FDE68A;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .application-step {
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="job-detail-container">
+    <div class="job-detail-layout">
+        
+        <!-- Sidebar con empleos similares -->
+        <aside class="similar-jobs-sidebar">
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">
+                    <i class="bi bi-briefcase me-2"></i>{% trans "Empleos similares" %}
+                </h3>
+                {% for similar_oferta in ofertas_similares %}
+                <a href="{% url 'job_detail' similar_oferta.id %}" class="similar-job-item">
+                    <div class="similar-job-title">{{ similar_oferta.titulo }}</div>
+                    <div class="similar-job-company">{{ similar_oferta.empresa.nombre_empresa }}</div>
+                    <div class="similar-job-meta">
+                        <i class="bi bi-geo-alt me-1"></i>{{ similar_oferta.ubicacion }}
+                        <span class="mx-2">•</span>
+                        {{ similar_oferta.get_tipo_empleo_display }}
+                    </div>
+                </a>
+                {% empty %}
+                <p class="text-muted small">{% trans "No hay empleos similares disponibles" %}</p>
+                {% endfor %}
+            </div>
+        </aside>
+        
+        <!-- Contenido principal -->
+        <main class="job-detail-main">
+            
+            <!-- Header con logo y título -->
+            <div class="job-detail-header">
+                <div class="job-header-content">
+                    <img src="{{ oferta.empresa.user.get_avatar_url }}" alt="Logo" class="company-logo-large">
+                    <div class="job-header-info">
+                        <h1 class="job-detail-title">{{ oferta.titulo }}</h1>
+                        <div class="job-detail-company">
+                            <a href="{% url 'profile_detail' oferta.empresa.user.id %}" class="text-decoration-none">
+                                {{ oferta.empresa.nombre_empresa }}
+                            </a>
+                        </div>
+                        <div class="job-detail-meta">
+                            <span class="job-detail-meta-item"><i class="bi bi-geo-alt"></i> {{ oferta.ubicacion }}</span>
+                            <span class="job-detail-meta-item"><i class="bi bi-briefcase"></i> {{ oferta.get_tipo_empleo_display }}</span>
+                            <span class="job-detail-meta-item"><i class="bi bi-laptop"></i> {{ oferta.get_modalidad_display }}</span>
+                            <span class="job-detail-meta-item"><i class="bi bi-clock"></i> {{ oferta.fecha_publicacion|timesince }} {% trans "atrás" %}</span>
+                        </div>
+                        <div class="job-detail-tags">
+                            <span class="job-tag highlighted">{{ oferta.get_nivel_display }}</span>
+                            {% if oferta.salario_min and oferta.mostrar_salario %}
+                            <span class="job-tag">${{ oferta.salario_min|floatformat:0 }} - ${{ oferta.salario_max|floatformat:0 }}</span>
+                            {% endif %}
+                            <span class="job-tag"><i class="bi bi-eye me-1"></i>{{ oferta.vistas }} vistas</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones de acción (SEPARADOS: Guardar y Aplicar) -->
+                {% if user.is_authenticated and user.tipo_usuario == 'profesional' %}
+                <div class="job-header-actions">
+                    
+                    <!-- BOTÓN GUARDAR (independiente de aplicar) -->
+                    <button type="button" 
+                            class="btn btn-outline-primary btn-save-job {% if esta_guardado %}saved{% endif %}" 
+                            id="btnGuardarEmpleo" 
+                            onclick="toggleGuardarEmpleo()">
+                        <i class="bi {% if esta_guardado %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}" id="iconGuardar"></i>
+                        <span id="textoGuardar">
+                            {% if esta_guardado %}
+                                {% trans "Guardado" %}
+                            {% else %}
+                                {% trans "Guardar empleo" %}
+                            {% endif %}
+                        </span>
+                    </button>
+                    
+                    <!-- BOTÓN APLICAR -->
+                    {% if ya_postulo %}
+                    <button type="button" class="btn btn-success" disabled>
+                        <i class="bi bi-check-circle me-1"></i>{% trans "Ya aplicaste" %}
+                    </button>
+                    {% else %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applyModal">
+                        <i class="bi bi-send me-1"></i>{% trans "Aplicar ahora" %}
+                    </button>
+                    {% endif %}
+                    
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Descripción del puesto -->
+            <div class="job-section">
+                <h2 class="section-title">{% trans "Descripción del puesto" %}</h2>
+                <div class="job-description">{{ oferta.descripcion|linebreaks }}</div>
+            </div>
+            
+            <!-- Requisitos -->
+            {% if oferta.requisitos %}
+            <div class="job-section">
+                <h2 class="section-title">{% trans "Requisitos" %}</h2>
+                <div class="job-description">{{ oferta.requisitos|linebreaks }}</div>
+            </div>
+            {% endif %}
+            
+            <!-- Responsabilidades -->
+            {% if oferta.responsabilidades %}
+            <div class="job-section">
+                <h2 class="section-title">{% trans "Responsabilidades" %}</h2>
+                <div class="job-description">{{ oferta.responsabilidades|linebreaks }}</div>
+            </div>
+            {% endif %}
+            
+        </main>
+        
+    </div>
+</div>
+
+<!-- Modal Aplicar (solo si es profesional y no ha aplicado) -->
+{% if user.is_authenticated and user.tipo_usuario == 'profesional' and not ya_postulo %}
+<div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="applyForm" method="post" action="{% url 'job_apply' oferta.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h2 class="modal-title" id="applyModalLabel">
+                        {% trans "Aplicar a" %} {{ oferta.titulo }}
+                    </h2>
+                    <button type="button" class="btn-close" onclick="intentarCerrarModal()"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <div class="modal-warning">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>{% trans "Importante:" %}</strong> {% trans "Todos los campos son obligatorios para enviar tu aplicación" %}
+                    </div>
+                    
+                    <!-- Paso 1: Información Profesional -->
+                    <div id="step1" class="application-step">
+                        <h4 class="mb-3">
+                            <i class="bi bi-1-circle-fill me-2"></i>{% trans "Tu Información Profesional" %}
+                        </h4>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Habilidades técnicas relevantes" %} *</label>
+                            <textarea name="habilidades_tecnicas" 
+                                      id="habilidades" 
+                                      class="form-control" 
+                                      rows="3" 
+                                      placeholder="{% trans 'Ej: Python, Django, React, PostgreSQL, Docker' %}" 
+                                      required
+                                      oninput="marcarModificado(); validarFormulario()"></textarea>
+                            <small class="text-muted">{% trans "Lista las habilidades que te hacen apto para este puesto" %}</small>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "Años de experiencia" %} *</label>
+                                <input type="number" 
+                                       name="anos_experiencia" 
+                                       id="experiencia" 
+                                       class="form-control" 
+                                       min="0" 
+                                       max="50" 
+                                       placeholder="0" 
+                                       required
+                                       oninput="marcarModificado(); validarFormulario()">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "Nivel de habilidad" %} *</label>
+                                <select name="nivel_habilidad" 
+                                        id="nivel" 
+                                        class="form-select" 
+                                        required 
+                                        onchange="marcarModificado(); validarFormulario()">
+                                    <option value="">{% trans "Seleccionar" %}</option>
+                                    <option value="junior">{% trans "Junior" %}</option>
+                                    <option value="mid">{% trans "Mid-level" %}</option>
+                                    <option value="senior">{% trans "Senior" %}</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "Teléfono de contacto" %} *</label>
+                                <input type="tel" 
+                                       name="telefono_contacto" 
+                                       id="telefono" 
+                                       class="form-control" 
+                                       placeholder="+58 424 1234567" 
+                                       minlength="10"
+                                       required
+                                       oninput="marcarModificado(); validarFormulario()">
+                                <small class="text-muted">{% trans "Mínimo 10 caracteres" %}</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "Email de contacto" %} *</label>
+                                <input type="email" 
+                                       name="email_contacto" 
+                                       id="email" 
+                                       class="form-control" 
+                                       value="{{ user.email }}" 
+                                       required
+                                       oninput="marcarModificado(); validarFormulario()">
+                            </div>
+                        </div>
+                        
+                        <div class="text-end">
+                            <button type="button" class="btn btn-primary" onclick="mostrarPaso2()" id="btnSiguiente" disabled>
+                                {% trans "Siguiente" %} <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Paso 2: Currículum -->
+                    <div id="step2" class="application-step" style="display: none;">
+                        <h4 class="mb-3">
+                            <i class="bi bi-2-circle-fill me-2"></i>{% trans "Sube tu Currículum" %}
+                        </h4>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Currículum Vitae" %} *</label>
+                            <input type="file" 
+                                   name="curriculum" 
+                                   id="curriculum" 
+                                   class="form-control" 
+                                   accept=".pdf,.doc,.docx" 
+                                   required
+                                   onchange="marcarModificado(); validarArchivo(this)">
+                            <small class="text-muted">{% trans "Formatos permitidos: PDF, DOC, DOCX. Máximo 5MB" %}</small>
+                            <div id="archivoInfo" class="mt-2"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="mostrarPaso1()">
+                                <i class="bi bi-arrow-left"></i> {% trans "Atrás" %}
+                            </button>
+                            <button type="submit" class="btn btn-success" id="btnEnviar" disabled>
+                                <i class="bi bi-send"></i> {% trans "Enviar aplicación" %}
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para salir -->
+<div class="modal fade" id="confirmCloseModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                    {% trans "¿Descartar cambios?" %}
+                </h5>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Has ingresado información que se perderá si cierras ahora. ¿Estás seguro de que deseas salir?" %}</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {% trans "Continuar editando" %}
+                </button>
+                <button type="button" class="btn btn-danger" onclick="forzarCerrarModal()">
+                    {% trans "Descartar y salir" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = '{{ csrf_token }}';
+let formDirty = false;
+let archivoValido = false;
+
+// Marcar formulario como modificado
+function marcarModificado() {
+    formDirty = true;
+}
+
+// Validar formulario en tiempo real
+function validarFormulario() {
+    const habilidades = document.getElementById('habilidades')?.value.trim() || '';
+    const experiencia = document.getElementById('experiencia')?.value.trim() || '';
+    const nivel = document.getElementById('nivel')?.value || '';
+    const telefono = document.getElementById('telefono')?.value.trim() || '';
+    const email = document.getElementById('email')?.value.trim() || '';
+    
+    const paso1Valido = habilidades && 
+                        experiencia && 
+                        parseInt(experiencia) >= 0 &&
+                        nivel && 
+                        telefono && 
+                        telefono.length >= 10 && 
+                        email &&
+                        email.includes('@');
+    
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    if (btnSiguiente) {
+        btnSiguiente.disabled = !paso1Valido;
+    }
+    
+    // Validar también el botón de enviar si estamos en paso 2
+    const step2 = document.getElementById('step2');
+    const btnEnviar = document.getElementById('btnEnviar');
+    if (step2 && step2.style.display !== 'none' && btnEnviar) {
+        btnEnviar.disabled = !paso1Valido || !archivoValido;
+    }
+}
+
+// Validar archivo
+function validarArchivo(input) {
+    const file = input.files[0];
+    const archivoInfo = document.getElementById('archivoInfo');
+    
+    if (!file) {
+        archivoInfo.innerHTML = '';
+        archivoValido = false;
+        document.getElementById('btnEnviar').disabled = true;
+        return;
+    }
+    
+    // Validar tamaño (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        archivoInfo.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle me-1"></i>{% trans "El archivo no debe superar 5MB" %}</div>';
+        archivoValido = false;
+        document.getElementById('btnEnviar').disabled = true;
+        return;
+    }
+    
+    // Validar formato
+    const allowed = ['.pdf', '.doc', '.docx'];
+    const ext = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+    if (!allowed.includes(ext)) {
+        archivoInfo.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle me-1"></i>{% trans "Solo se permiten archivos PDF, DOC o DOCX" %}</div>';
+        archivoValido = false;
+        document.getElementById('btnEnviar').disabled = true;
+        return;
+    }
+    
+    // Archivo válido
+    archivoInfo.innerHTML = `<div class="alert alert-success">
+        <i class="bi bi-check-circle me-1"></i>${file.name} (${(file.size / 1024).toFixed(2)} KB)
+    </div>`;
+    archivoValido = true;
+    validarFormulario();
+}
+
+// Navegación entre pasos
+function mostrarPaso2() {
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    validarFormulario();
+}
+
+function mostrarPaso1() {
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+}
+
+// Intentar cerrar modal (muestra confirmación si hay cambios)
+function intentarCerrarModal() {
+    if (formDirty) {
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmCloseModal'));
+        confirmModal.show();
+    } else {
+        forzarCerrarModal();
+    }
+}
+
+// Forzar cierre del modal
+function forzarCerrarModal() {
+    const applyModal = bootstrap.Modal.getInstance(document.getElementById('applyModal'));
+    if (applyModal) applyModal.hide();
+    
+    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmCloseModal'));
+    if (confirmModal) confirmModal.hide();
+    
+    // Resetear formulario
+    const form = document.getElementById('applyForm');
+    if (form) form.reset();
+    
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('archivoInfo').innerHTML = '';
+    formDirty = false;
+    archivoValido = false;
+}
+
+// Enviar formulario
+document.getElementById('applyForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const btnEnviar = document.getElementById('btnEnviar');
+    
+    btnEnviar.disabled = true;
+    btnEnviar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>{% trans "Enviando..." %}';
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            formDirty = false;
+            // Recargar página para mostrar estado "Ya aplicaste"
+            window.location.reload();
+        } else {
+            alert(data.error || '{% trans "Error al enviar aplicación" %}');
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = '<i class="bi bi-send"></i> {% trans "Enviar aplicación" %}';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{% trans "Error al enviar aplicación" %}');
+        btnEnviar.disabled = false;
+        btnEnviar.innerHTML = '<i class="bi bi-send"></i> {% trans "Enviar aplicación" %}';
+    });
+});
+
+// GUARDAR/QUITAR EMPLEO (separado de aplicar)
+function toggleGuardarEmpleo() {
+    const btn = document.getElementById('btnGuardarEmpleo');
+    const icon = document.getElementById('iconGuardar');
+    const texto = document.getElementById('textoGuardar');
+    
+    // Deshabilitar botón temporalmente
+    btn.disabled = true;
+    
+    fetch('/jobs/{{ oferta.id }}/save/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.guardado) {
+                // Ahora está guardado
+                btn.classList.add('saved');
+                icon.className = 'bi bi-bookmark-fill';
+                texto.textContent = '{% trans "Guardado" %}';
+            } else {
+                // Ya no está guardado
+                btn.classList.remove('saved');
+                icon.className = 'bi bi-bookmark';
+                texto.textContent = '{% trans "Guardar empleo" %}';
+            }
+        } else {
+            alert(data.error || '{% trans "Error al guardar empleo" %}');
+        }
+        btn.disabled = false;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{% trans "Error al guardar empleo" %}');
+        btn.disabled = false;
+    });
+}
+
+// Reset al abrir modal
+document.getElementById('applyModal')?.addEventListener('show.bs.modal', function() {
+    formDirty = false;
+    archivoValido = false;
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('archivoInfo').innerHTML = '';
+    validarFormulario();
+});
+</script>
+{% endblock %}

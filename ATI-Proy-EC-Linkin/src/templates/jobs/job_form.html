@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}
+{% if action == 'edit' %}
+    {% trans "Editar Oferta" %}
+{% else %}
+    {% trans "Nueva Oferta" %}
+{% endif %}
+ - Linking X
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        padding: 2rem;
+    }
+    
+    .form-header {
+        margin-bottom: 2rem;
+    }
+    
+    .form-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+    
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #0A66C2;
+        box-shadow: 0 0 0 3px #E7F3FF;
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1 class="form-title">
+                {% if action == 'edit' %}
+                    {% trans "Editar Oferta de Empleo" %}
+                {% else %}
+                    {% trans "Nueva Oferta de Empleo" %}
+                {% endif %}
+            </h1>
+            <p class="form-subtitle">{% trans "Completa los campos para publicar tu oferta" %}</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">{% trans "Título del puesto" %} *</label>
+                {{ form.titulo }}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Nivel de experiencia" %} *</label>
+                        {{ form.nivel }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Tipo de empleo" %} *</label>
+                        {{ form.tipo_empleo }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Modalidad" %} *</label>
+                        {{ form.modalidad }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Ubicación" %} *</label>
+                        {{ form.ubicacion }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{% trans "Descripción" %} *</label>
+                {{ form.descripcion }}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{% trans "Requisitos" %} *</label>
+                {{ form.requisitos }}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{% trans "Responsabilidades" %}</label>
+                {{ form.responsabilidades }}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Salario mínimo (USD)" %}</label>
+                        {{ form.salario_min }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Salario máximo (USD)" %}</label>
+                        {{ form.salario_max }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.mostrar_salario }}
+                    <label class="form-check-label">
+                        {% trans "Mostrar salario públicamente" %}
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{% url 'job_list' %}" class="btn btn-secondary">
+                    {% trans "Cancelar" %}
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-2"></i>
+                    {% if action == 'edit' %}
+                        {% trans "Guardar cambios" %}
+                    {% else %}
+                        {% trans "Crear oferta" %}
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

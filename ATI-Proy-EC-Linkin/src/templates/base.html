@@ -1,0 +1,466 @@
+{% load i18n %} {% load static %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %} ATI-Linking X{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}" />
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    
+    <!-- Linking X CSS -->
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/customs.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/components.css' %}" />
+    
+    <style>
+        /* Z-index para notificaciones */
+        .dropdown-menu {
+            z-index: 9999 !important;
+        }
+        .navbar {
+            z-index: 1030 !important;
+        }
+        /* Badge notificaciones */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        /* =========================================
+           DARK MODE - ESTILOS BASE
+           ========================================= */
+        body {
+            background-color: var(--bg-body, #f4f6f8);
+            color: var(--text-primary, #000000);
+            padding-bottom: 82px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .bottom-navbar {
+            background-color: var(--bg-card, white);
+            border-top: 1px solid var(--border-color, #e5e7eb);
+        }
+
+        .bottom-navbar a {
+            color: var(--text-secondary, #6b7280);
+        }
+
+        .bottom-navbar a.active,
+        .bottom-navbar a.navBarActive {
+            color: var(--link-color, #0A66C2);
+        }
+
+        @media (min-width: 992px) {
+            body { padding-bottom: 0; }
+            .bottom-navbar { display: none !important; }
+
+            .top-blue-bg {
+                position: absolute;
+                top: -30px;
+                left: 0;
+                width: 100%;
+                height: 70px;
+                background-color: #0A66C2;
+                z-index: -1;
+            }
+
+            .header-floating {
+                background-color: var(--bg-header, white) !important;
+                margin: 24px auto 0 !important;
+                max-width: 1400px;
+                width: calc(100% - 48px);
+                border-radius: 12px;
+                border: none !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+                top: 24px !important;
+            }
+
+            .main-floating {
+                max-width: 1400px;
+                width: calc(100% - 48px);
+                margin: 32px auto !important;
+                min-height: calc(100vh - 220px);
+            }
+
+            .footer-floating {
+                max-width: 1400px;
+                width: calc(100% - 48px);
+                margin: 0 auto 24px auto !important;
+                border-radius: 12px;
+                background-color: var(--bg-card, white) !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        /* =========================================
+           DARK MODE - OVERRIDES BOOTSTRAP
+           ========================================= */
+        html.dark-mode .dropdown-item:hover,
+        html.dark-mode .dropdown-item:focus {
+            background-color: var(--bg-body) !important;
+            color: var(--text-primary) !important;
+        }
+
+        html.dark-mode .dropdown-divider {
+            border-color: var(--border-color) !important;
+        }
+
+        html.dark-mode .navbar-brand,
+        html.dark-mode .navbar-brand:hover {
+            color: var(--link-color) !important;
+        }
+
+        html.dark-mode .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        html.dark-mode .border-bottom {
+            border-color: var(--border-color) !important;
+        }
+
+        html.dark-mode .nav-items-mobile a {
+            color: var(--text-secondary);
+        }
+
+        html.dark-mode .nav-items-mobile a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Placeholder en dark mode */
+        html.dark-mode ::placeholder {
+            color: var(--text-secondary) !important;
+            opacity: 1;
+        }
+
+        /* Bootstrap modals */
+        html.dark-mode .modal-content {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        html.dark-mode .modal-header {
+            border-bottom-color: var(--border-color) !important;
+        }
+
+        html.dark-mode .modal-footer {
+            border-top-color: var(--border-color) !important;
+        }
+
+        html.dark-mode .modal-body {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        html.dark-mode .btn-close {
+            filter: var(--invert-icon);
+        }
+
+        /* Bootstrap cards */
+        html.dark-mode .card {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        html.dark-mode .card-body {
+            background-color: var(--bg-card);
+        }
+
+        /* Badge bg-light en notificaciones no leidas */
+        html.dark-mode .bg-light {
+            background-color: var(--bg-body) !important;
+        }
+
+        /* Border bottom en header de notificaciones */
+        html.dark-mode .border-bottom {
+            border-bottom-color: var(--border-color) !important;
+        }
+
+        /* Boton toggle tema */
+        #theme-toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary, #6b7280);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        #theme-toggle-btn:hover {
+            background: var(--bg-body, #f3f4f6);
+            color: var(--text-primary, #111827);
+        }
+    </style>
+    
+    <!-- Anti-flash: aplica dark-mode antes del primer render -->
+    <script>
+      (function() {
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark-mode');
+        }
+      })();
+    </script>
+
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body {% block body_attrs %}{% endblock %}>
+    <div class="top-blue-bg d-none d-lg-block"></div>
+
+    {% if user.is_authenticated %}
+    <div class="bottom-navbar d-lg-none">
+      <a href="{% url 'message_list' %}" class="{% if 'message' in request.path %}navBarActive{% endif %}">
+        <i class="bi bi-chat-dots-fill"></i>
+      </a>
+      <a href="{% url 'job_list' %}" class="{% if 'job' in request.path %}navBarActive{% endif %}">
+        <i class="bi bi-briefcase-fill"></i>
+      </a>
+      <a href="{% url 'profile_detail' user.id %}" class="{% if 'profile' in request.path %}navBarActive{% endif %}">
+        <i class="bi bi-person-fill"></i>
+      </a>
+    </div>
+    {% endif %}
+
+    <header class="navbar navbar-expand-lg navbar-light border-bottom sticky-top shadow-sm header-floating" style="background-color: var(--bg-header, white) !important; border-color: var(--border-color, #dee2e6) !important;">
+      <div class="container-fluid px-3 px-lg-4">
+        <div class="d-flex">
+          {% if request.path != '/' and user.is_authenticated %}
+          <button onclick="history.back()" class="btn btn-link text-primary p-2 d-lg-none me-2" aria-label="{% trans 'Volver' %}">
+            <i class="bi bi-arrow-left fs-4"></i>
+          </button>
+          {% endif %}
+
+          <a href="{% if user.is_authenticated %}{% url 'feed_home' %}{% else %}{% url 'auth_login' %}{% endif %}" class="navbar-brand fw-bold text-primary d-flex align-items-center">
+            <div class="logo-circle me-2" style="width: 40px; height: 40px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: transparent;">
+              <img src="{% static 'img/LX-logo.png' %}" alt="Linking X Logo" style="max-width: 100%; max-height: 100%; object-fit: contain" />
+            </div>
+            <span class="d-none d-sm-inline">Linking X</span>
+          </a>
+        </div>
+        
+        <div class="nav-items-mobile d-flex d-lg-none justify-end gap-3">
+          <a href="{% url 'search_general' %}" class="position-relative">
+            <i class="bi bi-search"></i>
+          </a>
+          <a href="{% url 'notifications_list' %}" class="position-relative">
+            <i class="bi bi-bell-fill"></i>
+            {% if notificaciones_count > 0 %}
+            <span class="notification-badge">{{ notificaciones_count }}</span>
+            {% endif %}
+          </a>
+          <a href="{% url 'message_list' %}" class="{% if 'message' in request.path %}navBarActive{% endif %}">
+            <i class="bi bi-send-fill"></i>
+          </a>
+        </div>
+        
+        {% if user.is_authenticated %}
+        <form action="{% url 'search_general' %}" method="get" class="d-none d-lg-flex flex-grow-1 mx-4" style="max-width: 400px">
+          <div class="input-group">
+            <span class="input-group-text border-0" style="background-color: var(--bg-body); color: var(--text-secondary);">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="search" name="q" class="form-control border-0" style="background-color: var(--bg-body); color: var(--text-primary);" placeholder="{% trans 'Buscar' %}..." />
+          </div>
+        </form>
+        {% endif %}
+
+        <div class="d-none d-lg-flex align-items-center gap-1">
+          {% if user.is_authenticated %}
+          <div class="navbar-links d-flex align-items-center gap-3 me-3">
+            <a href="{% url 'feed_home' %}" class="nav-link-custom {% if 'feed' in request.path or request.path == '/' %}active{% endif %}">
+              <i class="bi bi-house-door-fill"></i>
+            </a>
+            <a href="{% url 'job_list' %}" class="nav-link-custom {% if 'job' in request.path %}active{% endif %}">
+              <i class="bi bi-briefcase-fill"></i>
+            </a>
+            <a href="{% url 'message_list' %}" class="nav-link-custom {% if 'message' in request.path %}active{% endif %}">
+              <i class="bi bi-chat-dots-fill"></i>
+            </a>
+            
+            <!-- NOTIFICACIONES DROPDOWN -->
+            <div class="dropdown">
+                <a href="#" class="nav-link-custom position-relative" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell-fill"></i>
+                    {% if notificaciones_count > 0 %}
+                    <span class="notification-badge">{{ notificaciones_count }}</span>
+                    {% endif %}
+                </a>
+                <div class="dropdown-menu dropdown-menu-end shadow" style="width: 360px; max-height: 500px; overflow-y: auto; background-color: var(--bg-card); border-color: var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                        <h6 class="mb-0 fw-bold">{% trans "Notificaciones" %}</h6>
+                        {% if notificaciones_count > 0 %}
+                        <button onclick="markAllNotificationsAsRead()" class="btn btn-sm btn-link p-0 text-primary text-decoration-none">
+                            {% trans "Marcar leídas" %}
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% for notif in notificaciones_recientes %}
+                    <a href="{% url 'mark_notification_read' notif.id %}" class="dropdown-item py-2" style="white-space: normal; color: var(--text-primary); background-color: {% if not notif.leida %}var(--bg-body){% else %}transparent{% endif %};">
+                        <div class="d-flex gap-2">
+                            {% if notif.emisor %}
+                            <img src="{{ notif.emisor.get_avatar_url }}" class="rounded-circle flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                                <i class="bi bi-bell-fill text-white"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1 small">
+                                <div class="fw-bold">{{ notif.titulo }}</div>
+                                <div class="text-muted">{{ notif.mensaje|truncatewords:10 }}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{ notif.fecha_creacion|timesince }} atrás</div>
+                            </div>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-bell-slash" style="font-size: 32px;"></i>
+                        <p class="small mb-0 mt-2">{% trans "No tienes notificaciones" %}</p>
+                    </div>
+                    {% endfor %}
+                    {% if notificaciones_recientes %}
+                    <a href="{% url 'notifications_list' %}" class="dropdown-item text-center text-primary border-top">
+                        {% trans "Ver todas" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+          </div>
+
+          <div class="dropdown">
+            <a href="#" class="nav-link-custom {% if 'profile' in request.path %}active{% endif %}" data-bs-toggle="dropdown" aria-expanded="false" style="display: flex; align-items: center; gap: 4px; justify-content: center; flex-direction: row;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
+                <img src="{{ user.get_avatar_url }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover" />
+              </div>
+              <i class="bi bi-caret-down-fill" style="font-size: 10px"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow" style="background-color: var(--bg-card); border-color: var(--border-color);">
+              <li>
+                <a class="dropdown-item" href="{% url 'profile_detail' user.id %}" style="color: var(--text-primary); background-color: transparent;">
+                  <i class="bi bi-person me-2"></i>{% trans "Ver perfil" %}
+                </a>
+              </li>
+              <li><hr class="dropdown-divider" style="border-color: var(--border-color);" /></li>
+              <li>
+                <a class="dropdown-item" href="#" onclick="toggleTheme(); return false;" style="color: var(--text-primary); background-color: transparent;">
+                  <i id="theme-toggle-icon" class="bi bi-moon me-2"></i>
+                  <span id="theme-toggle-label">{% trans "Modo oscuro" %}</span>
+                </a>
+              </li>
+              <li><hr class="dropdown-divider" style="border-color: var(--border-color);" /></li>
+              <li>
+                <form method="post" action="{% url 'auth_logout' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item text-danger" style="background-color: transparent;">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    {% trans "Cerrar sesión" %}
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </div>
+          {% else %}
+          <button id="theme-toggle-btn" title="Cambiar tema" onclick="toggleTheme()">
+            <i id="theme-toggle-icon" class="bi bi-moon"></i>
+          </button>
+          <a href="{% url 'auth_login' %}" class="btn btn-outline-primary me-2">
+            {% trans "Iniciar sesión" %}
+          </a>
+          <a href="{% url 'auth_register_role' %}" class="btn btn-primary">
+            {% trans "Registrarse" %}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content main-floating" {% block main_attrs %}{% endblock %}>
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if not user.is_authenticated %}
+    <footer class="py-2 mt-5 footer-floating" style="background-color: var(--bg-card) !important;">
+      <div class="container text-center" style="color: var(--text-secondary);">
+        <small>© {% now "Y" %} Linking X. {% trans "Todos los derechos reservados." %}</small>
+      </div>
+    </footer>
+    {% endif %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+    // =========================================
+    // DARK MODE TOGGLE
+    // =========================================
+    function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark-mode');
+
+        if (isDark) {
+            html.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+            syncThemeUI(false);
+        } else {
+            html.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+            syncThemeUI(true);
+        }
+    }
+
+    function syncThemeUI(isDark) {
+        const icon = document.getElementById('theme-toggle-icon');
+        const label = document.getElementById('theme-toggle-label');
+        if (icon) icon.className = isDark ? 'bi bi-sun me-2' : 'bi bi-moon me-2';
+        if (label) label.textContent = isDark ? '{% trans "Modo claro" %}' : '{% trans "Modo oscuro" %}';
+    }
+
+    // Sincronizar al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        syncThemeUI(localStorage.getItem('theme') === 'dark');
+    });
+
+    // =========================================
+    // NOTIFICACIONES (necesita template tags)
+    // =========================================
+    function markAllNotificationsAsRead() {
+        fetch('{% url "mark_all_notifications_read" %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(r => r.json())
+        .then(data => { if (data.success) window.location.reload(); })
+        .catch(e => console.error('Error:', e));
+    }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

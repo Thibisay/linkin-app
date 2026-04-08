@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{{ profile_user.get_full_name }} - Linking X{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    
+    <div class="profile-header-card">
+        <div class="cover-photo"></div>
+        <div class="profile-header-content">
+            <div class="profile-avatar-section">
+                <img src="{{ profile_user.get_avatar_url }}" alt="Avatar" class="profile-avatar">
+            </div>
+            <h1 class="profile-name">{{ profile_user.get_full_name }}</h1>
+            {% if profesional.titulo_actual %}
+            <p class="profile-title">{{ profesional.titulo_actual }}</p>
+            {% endif %}
+            {% if profile_user.ubicacion %}
+            <p class="profile-location">
+                <i class="bi bi-geo-alt"></i> {{ profile_user.ubicacion }}
+            </p>
+            {% endif %}
+            <div class="profile-actions">
+                {% if is_own_profile %}
+                    <a href="{% url 'profile_edit' user.id %}" class="btn btn-secondary">
+                        <i class="bi bi-pencil"></i> {% trans "Editar perfil" %}
+                    </a>
+                {% else %}
+                    <button type="button" class="btn btn-primary follow-btn {% if esta_siguiendo %}following{% endif %}"
+                        onclick="toggleFollow('{{ profile_user.id }}', this)">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span class="follow-text">
+                            {% if esta_siguiendo %}{% trans "Siguiendo" %}{% else %}{% trans "Seguir" %}{% endif %}
+                        </span>
+                    </button>
+                    <a href="{% url 'create_conversation' profile_user.id %}" class="btn btn-secondary">
+                        <i class="bi bi-chat-dots"></i> {% trans "Mensaje" %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="profile-stats-card">
+        <div class="stat-item">
+            <div class="stat-value" id="seguidoresCount">{{ total_seguidores }}</div>
+            <div class="stat-label">{% trans "Seguidores" %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ total_siguiendo }}</div>
+            <div class="stat-label">{% trans "Siguiendo" %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ total_conexiones }}</div>
+            <div class="stat-label">{% trans "Conexiones" %}</div>
+        </div>
+    </div>
+    
+    <div class="profile-layout">
+        <div class="main-content">
+            {% if profesional.descripcion_personal %}
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Acerca de" %}</h2>
+                    {% if is_own_profile %}
+                    <a href="{% url 'profile_edit' user.id %}" class="section-action">
+                        <i class="bi bi-pencil"></i> {% trans "Editar" %}
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="about-text">{{ profesional.descripcion_personal }}</div>
+            </div>
+            {% endif %}
+            
+            {% if experiencias %}
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Experiencia" %}</h2>
+                    {% if is_own_profile %}
+                    <a href="{% url 'add_section' 'experiencia' %}" class="section-action">
+                        <i class="bi bi-plus-lg"></i> {% trans "Agregar" %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% for exp in experiencias %}
+                <div class="timeline-item">
+                    <div class="timeline-icon"><i class="bi bi-briefcase"></i></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">{{ exp.cargo }}</div>
+                        <div class="timeline-subtitle">{{ exp.empresa }}</div>
+                        <div class="timeline-date">
+                            {{ exp.fecha_inicio|date:"M Y" }} - 
+                            {% if exp.actualmente_trabaja %}{% trans "Actualidad" %}{% else %}{{ exp.fecha_fin|date:"M Y" }}{% endif %}
+                        </div>
+                        {% if exp.descripcion %}<div class="timeline-description">{{ exp.descripcion }}</div>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if educaciones %}
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Educación" %}</h2>
+                    {% if is_own_profile %}
+                    <a href="{% url 'add_section' 'educacion' %}" class="section-action">
+                        <i class="bi bi-plus-lg"></i> {% trans "Agregar" %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% for edu in educaciones %}
+                <div class="timeline-item">
+                    <div class="timeline-icon"><i class="bi bi-mortarboard"></i></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">{{ edu.titulo }}</div>
+                        <div class="timeline-subtitle">{{ edu.institucion }}</div>
+                        <div class="timeline-date">
+                            {{ edu.fecha_inicio|date:"Y" }} - 
+                            {% if edu.actualmente_cursando %}{% trans "Actualidad" %}{% else %}{{ edu.fecha_fin|date:"Y" }}{% endif %}
+                        </div>
+                        {% if edu.descripcion %}<div class="timeline-description">{{ edu.descripcion }}</div>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if habilidades %}
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Habilidades" %}</h2>
+                    {% if is_own_profile %}
+                    <a href="{% url 'add_section' 'habilidad' %}" class="section-action">
+                        <i class="bi bi-plus-lg"></i> {% trans "Agregar" %}
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="skills-grid">
+                    {% for skill in habilidades %}
+                    <span class="skill-badge">{{ skill.nombre }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <aside class="sidebar-content">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Información de contacto" %}</h2>
+                </div>
+                {% if profile_user.email %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-envelope"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">{% trans "Email" %}</div>
+                        <div class="contact-value">{{ profile_user.email }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if profesional.linkedin_url %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-linkedin"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">LinkedIn</div>
+                        <a href="{{ profesional.linkedin_url }}" target="_blank" class="contact-value">{% trans "Ver perfil" %}</a>
+                    </div>
+                </div>
+                {% endif %}
+                {% if profesional.github_url %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-github"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">GitHub</div>
+                        <a href="{{ profesional.github_url }}" target="_blank" class="contact-value">{% trans "Ver perfil" %}</a>
+                    </div>
+                </div>
+                {% endif %}
+                {% if profesional.portfolio_url %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-globe"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">{% trans "Portafolio" %}</div>
+                        <a href="{{ profesional.portfolio_url }}" target="_blank" class="contact-value">{% trans "Visitar sitio" %}</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <section class="ad-card hide-mobile">
+                <div class="ad-label">{% trans "Publicidad" %}</div>
+                <div class="ad-content">
+                    <div class="ad-placeholder"><span>LOGO</span></div>
+                    <p class="ad-text">{% trans "Promociona tu empresa en Linking X" %}</p>
+                    <button class="btn btn-secondary btn-block btn-sm">{% trans "Más información" %}</button>
+                </div>
+            </section>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = '{{ csrf_token }}';
+function toggleFollow(usuarioId, button) {
+    fetch(`/feed/user/${usuarioId}/follow/`, { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        .then(r => r.json()).then(data => {
+            if (data.success) {
+                const text = button.querySelector('.follow-text');
+                const icon = button.querySelector('i');
+                button.classList.toggle('following', data.siguiendo);
+                text.textContent = data.siguiendo ? '{% trans "Siguiendo" %}' : '{% trans "Seguir" %}';
+                icon.className = data.siguiendo ? 'bi bi-person-check-fill' : 'bi bi-person-plus-fill';
+                const count = document.getElementById('seguidoresCount');
+                if (count) count.textContent = parseInt(count.textContent) + (data.siguiendo ? 1 : -1);
+            }
+        });
+}
+</script>
+{% endblock %}

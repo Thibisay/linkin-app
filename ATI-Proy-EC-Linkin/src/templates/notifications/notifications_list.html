@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Notificaciones" %} - Linking X{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notifications-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .notifications-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .notifications-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+    
+    .mark-all-read-btn {
+        padding: 0.5rem 1rem;
+        background: white;
+        color: #0A66C2;
+        border: 1px solid #0A66C2;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .mark-all-read-btn:hover {
+        background: #E7F3FF;
+    }
+    
+    .notifications-filters {
+        display: flex;
+        gap: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-tab {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        text-decoration: none;
+    }
+    
+    .filter-tab.active {
+        color: #0A66C2;
+        border-bottom-color: #0A66C2;
+    }
+    
+    .notification-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+        transition: all 0.2s;
+    }
+    
+    .notification-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .notification-card.unread {
+        background: #F0F9FF;
+        border-left: 3px solid #0A66C2;
+    }
+    
+    .notification-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+    }
+    
+    .notification-message {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+    
+    .notification-time {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+    
+    .notification-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: #6b7280;
+    }
+    
+    .btn-icon:hover {
+        background: #f3f4f6;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notifications-container">
+    
+    <div class="notifications-header">
+        <h1 class="notifications-title">{% trans "Notificaciones" %}</h1>
+        {% if total_no_leidas > 0 %}
+        <button class="mark-all-read-btn" onclick="markAllAsRead()">
+            {% trans "Marcar todas como leídas" %}
+        </button>
+        {% endif %}
+    </div>
+    
+    <div class="notifications-filters">
+        <a href="?filter=all" class="filter-tab {% if filter_type == 'all' %}active{% endif %}">
+            {% trans "Todas" %}
+        </a>
+        <a href="?filter=unread" class="filter-tab {% if filter_type == 'unread' %}active{% endif %}">
+            {% trans "No leídas" %} {% if total_no_leidas > 0 %}({{ total_no_leidas }}){% endif %}
+        </a>
+        <a href="?filter=read" class="filter-tab {% if filter_type == 'read' %}active{% endif %}">
+            {% trans "Leídas" %}
+        </a>
+    </div>
+    
+    {% for notif in notificaciones %}
+    <div class="notification-card {% if not notif.leida %}unread{% endif %}">
+        {% if notif.emisor %}
+        <img src="{{ notif.emisor.get_avatar_url }}" alt="Avatar" class="notification-avatar">
+        {% else %}
+        <div class="notification-avatar" style="background: #E7F3FF; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-bell-fill" style="color: #0A66C2; font-size: 20px;"></i>
+        </div>
+        {% endif %}
+        
+        <div class="notification-content">
+            <div class="notification-title">{{ notif.titulo }}</div>
+            <div class="notification-message">{{ notif.mensaje }}</div>
+            <div class="notification-time">
+                <i class="bi bi-clock"></i> {{ notif.fecha_creacion|timesince }} {% trans "atrás" %}
+            </div>
+        </div>
+        
+        <div class="notification-actions">
+            {% if notif.url %}
+            <a href="{% url 'mark_notification_read' notif.id %}" class="btn-icon" title="{% trans 'Ver' %}">
+                <i class="bi bi-arrow-right"></i>
+            </a>
+            {% endif %}
+            <button class="btn-icon" onclick="deleteNotification('{{ notif.id }}')" title="{% trans 'Eliminar' %}">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <i class="bi bi-bell-slash" style="font-size: 64px;"></i>
+        <h3>{% trans "No tienes notificaciones" %}</h3>
+        <p>{% trans "Cuando recibas notificaciones, aparecerán aquí" %}</p>
+    </div>
+    {% endfor %}
+    
+    <!-- Paginación -->
+    {% if notificaciones.has_other_pages %}
+    <div class="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+        {% if notificaciones.has_previous %}
+        <a href="?page={{ notificaciones.previous_page_number }}&filter={{ filter_type }}" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none;">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        {% endif %}
+        
+        <span style="padding: 0.5rem 1rem;">
+            {% trans "Página" %} {{ notificaciones.number }} {% trans "de" %} {{ notificaciones.paginator.num_pages }}
+        </span>
+        
+        {% if notificaciones.has_next %}
+        <a href="?page={{ notificaciones.next_page_number }}&filter={{ filter_type }}" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none;">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = '{{ csrf_token }}';
+
+function markAllAsRead() {
+    fetch('{% url "mark_all_notifications_read" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function deleteNotification(notificationId) {
+    if (!confirm('{% trans "¿Eliminar esta notificación?" %}')) {
+        return;
+    }
+    
+    fetch(`/notifications/${notificationId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}

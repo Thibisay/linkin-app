@@ -1,0 +1,106 @@
+/* ============================================
+   LINKING X - CSS VARIABLES
+   Bootstrap Compatible
+   ============================================ */
+
+:root {
+  /* Brand Colors */
+  --lx-primary: #0A66C2;
+  --lx-primary-hover: #004182;
+  --lx-primary-light: #E7F3FF;
+  --lx-primary-dark: #003366;
+  
+  /* Grays */
+  --lx-gray-50: #F9FAFB;
+  --lx-gray-100: #F3F4F6;
+  --lx-gray-200: #E5E7EB;
+  --lx-gray-300: #D1D5DB;
+  --lx-gray-400: #9CA3AF;
+  --lx-gray-500: #6B7280;
+  --lx-gray-600: #4B5563;
+  --lx-gray-700: #374151;
+  --lx-gray-800: #1F2937;
+  --lx-gray-900: #111827;
+  
+  /* Semantic Colors */
+  --lx-success: #10B981;
+  --lx-warning: #F59E0B;
+  --lx-danger: #EF4444;
+  --lx-info: #3B82F6;
+  
+  /* Shadows */
+  --lx-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --lx-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --lx-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --lx-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --lx-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  
+  /* Spacing */
+  --lx-navbar-height: 56px;
+  --lx-bottom-nav-height: 56px;
+  
+  /* Border Radius */
+  --lx-radius-sm: 4px;
+  --lx-radius: 8px;
+  --lx-radius-lg: 12px;
+  --lx-radius-xl: 16px;
+  --lx-radius-full: 9999px;
+  
+  /* Transitions */
+  --lx-transition: all 0.2s ease;
+
+  /* =========================================
+     PALETA DINÁMICA (MODO CLARO POR DEFECTO)
+     ========================================= */
+  --bg-body: var(--lx-gray-50);
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --text-primary: var(--lx-gray-900);
+  --text-secondary: var(--lx-gray-500);
+  --border-color: var(--lx-gray-200);
+  --link-color: var(--lx-primary);
+  --invert-icon: none;
+}
+
+/* =========================================
+   PALETA DINÁMICA (MODO OSCURO)
+   ========================================= */
+html.dark-mode {
+  --bg-body: #18191a !important;
+  --bg-card: #242526 !important;
+  --bg-header: #242526 !important;
+  --text-primary: #e4e6eb !important;
+  --text-secondary: #b0b3b8 !important;
+  --border-color: #3e4042 !important;
+  --link-color: #459fff !important;
+  --invert-icon: invert(1) !important;
+}
+
+/* Bootstrap Color Overrides */
+.btn-primary {
+  --bs-btn-bg: var(--lx-primary);
+  --bs-btn-border-color: var(--lx-primary);
+  --bs-btn-hover-bg: var(--lx-primary-hover);
+  --bs-btn-hover-border-color: var(--lx-primary-hover);
+  --bs-btn-active-bg: var(--lx-primary-dark);
+  --bs-btn-active-border-color: var(--lx-primary-dark);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--lx-primary);
+  --bs-btn-border-color: var(--lx-primary);
+  --bs-btn-hover-bg: var(--lx-primary);
+  --bs-btn-hover-border-color: var(--lx-primary);
+}
+
+.text-primary {
+  color: var(--lx-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--lx-primary) !important;
+}
+
+.border-primary {
+  border-color: var(--lx-primary) !important;
+}

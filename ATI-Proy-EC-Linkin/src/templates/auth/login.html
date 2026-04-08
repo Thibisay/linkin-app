@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Iniciar Sesión - Linking X" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-form-container">
+        <div class="auth-form-wrapper">
+            
+            <div class="auth-header">
+                <h1>{% trans "Iniciar Sesión" %}</h1>
+                <p>{% trans "Conecta con tu futuro profesional" %}</p>
+            </div>
+            
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="id_username" class="form-label">{% trans "Correo electrónico" %}</label>
+                    <div class="form-control-wrapper">
+                        <i class="bi bi-envelope form-icon"></i>
+                        <input type="email" name="username" id="id_username" class="form-control {% if form.username.errors %}error{% endif %}" placeholder="ejemplo@linkingx.com" value="{{ form.username.value|default:'' }}" required>
+                    </div>
+                    {% if form.username.errors %}
+                        <span class="form-error">{{ form.username.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_password" class="form-label">{% trans "Contraseña" %}</label>
+                    <div class="form-control-wrapper">
+                        <i class="bi bi-lock form-icon"></i>
+                        <input type="password" name="password" id="id_password" class="form-control {% if form.password.errors %}error{% endif %}" placeholder="••••••••" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('id_password', this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                        <span class="form-error">{{ form.password.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="forgot-link">
+                    <a href="#">{% trans "¿Olvidaste tu contraseña?" %}</a>
+                </div>
+                
+                <button type="submit" class="btn-submit">{% trans "Iniciar Sesión" %}</button>
+                
+                <div class="divider"><span>{% trans "o" %}</span></div>
+                
+                <div class="auth-footer">
+                    {% trans "¿No tienes cuenta?" %}
+                    <a href="{% url 'auth_register_role' %}">{% trans "Regístrate" %}</a>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+    
+    <div class="auth-brand-panel">
+        <div class="brand-content">
+            <div class="brand-logo">
+                <img src="{% static 'img/logo-icon.png' %}" alt="Linking X Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%; padding: 15px;">
+            </div>
+            <h2>Linking X</h2>
+            <p>{% trans "Conectando talento con oportunidades. Tu futuro profesional comienza aquí." %}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+</script>
+{% endblock %}

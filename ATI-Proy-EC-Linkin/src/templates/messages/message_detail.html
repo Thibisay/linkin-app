@@ -1,0 +1,572 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{{ otro_usuario.get_full_name }} - {% trans "Mensajes" %} - Linking X{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messages.css' %}">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('page-message-detail');
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="messenger-container">
+    <div class="messenger-layout messenger-layout--detail" id="messengerLayout">
+        
+        <!-- Columna izquierda — lista conversaciones -->
+        <div class="conversations-column">
+            <div class="conversations-header">
+                <div class="conversations-title-row">
+                    <h1 class="conversations-title">{% trans "Mensajes" %}</h1>
+                    <div class="header-actions">
+                        <button type="button" class="header-btn" onclick="openNewMessageModal()" title="{% trans 'Nuevo mensaje' %}">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button type="button" class="header-btn" onclick="toggleOptionsDropdown(event)" title="{% trans 'Opciones' %}">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="conversations-search">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="{% trans 'Buscar' %}" id="searchInput">
+                </div>
+            </div>
+            
+            <div class="conversations-list">
+                {% for conv_data in conversaciones_data %}
+                <a href="{% url 'message_detail' conv_data.conversacion.id %}"
+                    class="conversation-item {% if conv_data.conversacion.id == conversacion.id %}active{% endif %}">
+                    <div class="conversation-avatar">
+                        <img src="{{ conv_data.otro_usuario.get_avatar_url }}" alt="Avatar">
+                    </div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">
+                            {{ conv_data.otro_usuario.get_full_name }}
+                        </div>
+                        <div class="conversation-preview {% if conv_data.no_leidos > 0 %}unread{% endif %}">
+                            {% if conv_data.ultimo_mensaje %}
+                                {{ conv_data.ultimo_mensaje.contenido|truncatewords:6 }}
+                            {% else %}
+                                {% trans "Nueva conversación" %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="conversation-meta">
+                        {% if conv_data.ultimo_mensaje %}
+                        <span class="conversation-time">
+                            {{ conv_data.ultimo_mensaje.fecha_envio|timesince }}
+                        </span>
+                        {% endif %}
+                        {% if conv_data.no_leidos > 0 %}
+                        <span class="unread-badge">{{ conv_data.no_leidos }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Columna central — chat -->
+        <div class="chat-column">
+            
+            <div class="chat-header">
+                <!-- Botón Atrás (visible solo en mobile) -->
+                <a href="{% url 'message_list' %}" class="header-btn" style="display: none;" id="backButton">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                
+                <div class="chat-header-avatar">
+                    <img src="{{ otro_usuario.get_avatar_url }}" alt="Avatar">
+                </div>
+                
+                <div class="chat-header-info" onclick="toggleProfilePanel()">
+                    <div class="chat-header-name">{{ otro_usuario.get_full_name }}</div>
+                    <div class="chat-header-status">
+                        {% if otro_usuario.tipo_usuario == 'profesional' and otro_usuario.profesional.titulo_actual %}
+                            {{ otro_usuario.profesional.titulo_actual }}
+                        {% elif otro_usuario.tipo_usuario == 'empresa' and otro_usuario.empresa.nombre_empresa %}
+                            {{ otro_usuario.empresa.nombre_empresa }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="chat-header-actions">
+                    <button type="button" class="header-btn" onclick="toggleProfilePanel()">
+                        <i class="bi bi-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+            
+            {% if es_solicitud_pendiente %}
+            <div class="request-banner">
+                <div class="request-banner-info">
+                    <div class="request-banner-icon"><i class="bi bi-envelope-heart"></i></div>
+                    <div class="request-banner-text">
+                        <h4>{% trans "Solicitud de mensaje" %}</h4>
+                        <p>{% trans "¿Quieres aceptar esta conversación?" %}</p>
+                    </div>
+                </div>
+                <div class="request-banner-actions">
+                    <form method="post" action="{% url 'accept_conversation' conversacion.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-accept-request">
+                            <i class="bi bi-check-lg me-1"></i> {% trans "Aceptar" %}
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'reject_conversation' conversacion.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-reject-request">
+                            <i class="bi bi-x-lg me-1"></i> {% trans "Rechazar" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if es_bloqueada %}
+            <div class="blocked-banner">
+                <h4><i class="bi bi-slash-circle me-2"></i>{% trans "Conversación bloqueada" %}</h4>
+                <p>
+                    {% if bloqueada_por_mi %}{% trans "Has bloqueado a este usuario" %}
+                    {% else %}{% trans "Este usuario te ha bloqueado" %}{% endif %}
+                </p>
+            </div>
+            {% endif %}
+            
+            <div class="chat-messages" id="chatMessages">
+                {% regroup mensajes by fecha_envio.date as mensajes_por_dia %}
+                {% for dia in mensajes_por_dia %}
+                    <div class="message-date">
+                        <span>{{ dia.grouper|date:"d F Y" }}</span>
+                    </div>
+                    {% for mensaje in dia.list %}
+                    <div class="message-group {% if mensaje.emisor == request.user %}sent{% else %}received{% endif %}">
+                        <img src="{{ mensaje.emisor.get_avatar_url }}" alt="Avatar" class="message-avatar">
+                        <div class="messages-wrapper">
+                            <div class="message-bubble">{{ mensaje.contenido }}</div>
+                            <div class="message-time">{{ mensaje.fecha_envio|date:"H:i" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% empty %}
+                <div class="empty-chat">
+                    <i class="bi bi-chat-dots"></i>
+                    <h3>{% trans "No hay mensajes aún" %}</h3>
+                    <p>{% trans "Inicia la conversación enviando un mensaje" %}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if not es_bloqueada and conversacion.estado == 'aceptada' or conversacion.participante_1 == request.user %}
+            <div class="chat-input-area">
+                <form id="messageForm" method="post" action="{% url 'send_message' conversacion.id %}">
+                    {% csrf_token %}
+                    <div class="chat-input-wrapper">
+                        <button type="button" class="chat-input-btn" title="{% trans 'Adjuntar archivo' %}">
+                            <i class="bi bi-paperclip"></i>
+                        </button>
+                        <textarea name="contenido" class="chat-input-field"
+                            placeholder="{% trans 'Escribe un mensaje...' %}"
+                            id="messageInput" rows="1" required></textarea>
+                        <button type="submit" class="chat-send-btn" id="sendBtn">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+            
+        </div>
+
+        <!-- Columna derecha — panel de perfil -->
+        <div class="profile-column" id="profilePanel">
+            <button type="button" class="profile-close-btn" onclick="toggleProfilePanel()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            
+            <div class="profile-panel-header">
+                <img src="{{ otro_usuario.get_avatar_url }}" alt="Avatar" class="profile-panel-avatar">
+                <div class="profile-panel-name">{{ otro_usuario.get_full_name }}</div>
+                <div class="profile-panel-status">
+                    {% if otro_usuario.tipo_usuario == 'profesional' %}
+                        {{ otro_usuario.profesional.titulo_actual|default:"Profesional" }}
+                    {% elif otro_usuario.tipo_usuario == 'empresa' %}
+                        {{ otro_usuario.empresa.nombre_empresa }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-panel-actions">
+                <a href="{% url 'profile_detail' otro_usuario.id %}" class="profile-panel-btn">
+                    <i class="bi bi-person-circle" style="font-size: 20px;"></i>
+                    <span>{% trans "Ver perfil" %}</span>
+                </a>
+                <button type="button" class="profile-panel-btn">
+                    <i class="bi bi-bell-slash" style="font-size: 20px;"></i>
+                    <span>{% trans "Silenciar" %}</span>
+                </button>
+                <button type="button" class="profile-panel-btn">
+                    <i class="bi bi-search" style="font-size: 20px;"></i>
+                    <span>{% trans "Buscar" %}</span>
+                </button>
+                {% if bloqueada_por_mi %}
+                <form method="post" action="{% url 'unblock_conversation' conversacion.id %}"
+                    style="grid-column: span 2;">
+                    {% csrf_token %}
+                    <button type="submit" class="profile-panel-btn" style="width: 100%;">
+                        <i class="bi bi-unlock" style="font-size: 20px;"></i>
+                        <span>{% trans "Desbloquear" %}</span>
+                    </button>
+                </form>
+                {% else %}
+                <button type="button" class="profile-panel-btn profile-panel-btn--danger">
+                    <i class="bi bi-slash-circle" style="font-size: 20px;"></i>
+                    <span>{% trans "Bloquear" %}</span>
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="profile-panel-section">
+                <h3 class="profile-panel-section-title">{% trans "Información" %}</h3>
+                
+                {% if otro_usuario.email %}
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                        {% trans "Email" %}
+                    </div>
+                    <div style="font-size: 14px; color: var(--text-primary);">
+                        {{ otro_usuario.email }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if otro_usuario.ubicacion %}
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                        {% trans "Ubicación" %}
+                    </div>
+                    <div style="font-size: 14px; color: var(--text-primary);">
+                        <i class="bi bi-geo-alt me-1"></i>{{ otro_usuario.ubicacion }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if otro_usuario.telefono %}
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                        {% trans "Teléfono" %}
+                    </div>
+                    <div style="font-size: 14px; color: var(--text-primary);">
+                        {{ otro_usuario.telefono }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+        
+    </div>
+</div>
+
+<!-- Modal Nuevo Mensaje -->
+<div class="new-message-modal" id="newMessageModal">
+    <div class="new-message-dialog">
+        <div class="new-message-header">
+            <h2 class="new-message-title">{% trans "Nuevo mensaje" %}</h2>
+            <button type="button" class="modal-close-btn" onclick="closeNewMessageModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="new-message-search">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="userSearchInput" placeholder="{% trans 'Buscar contacto...' %}" oninput="searchUsers()">
+            </div>
+        </div>
+        
+        <div class="users-list" id="usersList">
+            <div class="empty-search">
+                <i class="bi bi-people" style="font-size: 48px; margin-bottom: 1rem;"></i>
+                <p>{% trans "Busca un contacto para enviar un mensaje" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dropdown Opciones (3 puntos) -->
+<div class="dropdown-menu-custom" id="optionsDropdown">
+    <button class="dropdown-item" onclick="marcarTodosLeidos()">
+        <i class="bi bi-check2-all"></i>
+        <span>{% trans "Marcar todo como leído" %}</span>
+    </button>
+    <button class="dropdown-item" onclick="ordenarPorFecha()">
+        <i class="bi bi-sort-down"></i>
+        <span>{% trans "Ordenar por fecha" %}</span>
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item" onclick="configuracionMensajes()">
+        <i class="bi bi-gear"></i>
+        <span>{% trans "Configuración" %}</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = '{{ csrf_token }}';
+
+// Scroll to bottom on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const chat = document.getElementById('chatMessages');
+    if (chat) {
+        chat.scrollTop = chat.scrollHeight;
+    }
+    
+    // Mostrar botón atrás en mobile
+    if (window.innerWidth < 992) {
+        document.getElementById('backButton').style.display = 'flex';
+    }
+});
+
+// Handle form submission
+document.getElementById('messageForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const contenido = document.getElementById('messageInput').value.trim();
+    if (!contenido) return;
+    
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || '{% trans "Error al enviar mensaje" %}');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{% trans "Error al enviar mensaje" %}');
+    })
+    .finally(() => {
+        sendBtn.disabled = false;
+    });
+});
+
+// Auto-resize textarea
+const messageInput = document.getElementById('messageInput');
+if (messageInput) {
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+    
+    // Send message on Enter (Shift+Enter for new line)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+        }
+    });
+}
+
+// Toggle profile panel
+function toggleProfilePanel() {
+    const messengerLayout = document.getElementById('messengerLayout');
+    messengerLayout.classList.toggle('show-profile');
+}
+
+// Responsive: mostrar/ocultar botón atrás
+window.addEventListener('resize', function() {
+    const backButton = document.getElementById('backButton');
+    if (window.innerWidth < 992) {
+        backButton.style.display = 'flex';
+    } else {
+        backButton.style.display = 'none';
+    }
+});
+
+// Auto-refresh messages every 10 seconds
+setInterval(function() {
+    fetch(window.location.href + '?ajax=1')
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newMessages = doc.getElementById('chatMessages');
+            
+            if (newMessages) {
+                const currentMessages = document.getElementById('chatMessages');
+                const isAtBottom = currentMessages.scrollHeight - currentMessages.scrollTop === currentMessages.clientHeight;
+                
+                if (currentMessages.innerHTML !== newMessages.innerHTML) {
+                    currentMessages.innerHTML = newMessages.innerHTML;
+                    
+                    if (isAtBottom) {
+                        currentMessages.scrollTop = currentMessages.scrollHeight;
+                    }
+                }
+            }
+        })
+        .catch(error => console.error('Error refreshing messages:', error));
+}, 10000);
+
+// ========== MODAL NUEVO MENSAJE ==========
+function openNewMessageModal() {
+    document.getElementById('newMessageModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('userSearchInput').focus();
+}
+
+function closeNewMessageModal() {
+    document.getElementById('newMessageModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    document.getElementById('userSearchInput').value = '';
+    document.getElementById('usersList').innerHTML = `
+        <div class="empty-search">
+            <i class="bi bi-people" style="font-size: 48px; margin-bottom: 1rem;"></i>
+            <p>{% trans "Busca un contacto para enviar un mensaje" %}</p>
+        </div>
+    `;
+}
+
+// Buscar usuarios
+let searchTimeout;
+function searchUsers() {
+    const query = document.getElementById('userSearchInput').value.trim();
+    
+    if (query.length < 2) {
+        document.getElementById('usersList').innerHTML = `
+            <div class="empty-search">
+                <i class="bi bi-people" style="font-size: 48px; margin-bottom: 1rem;"></i>
+                <p>{% trans "Busca un contacto para enviar un mensaje" %}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        fetch(`/api/search-users/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.users && data.users.length > 0) {
+                    let html = '';
+                    data.users.forEach(user => {
+                        html += `
+                            <a href="/messages/create/${user.id}/" class="user-item">
+                                <img src="${user.avatar}" alt="Avatar" class="user-avatar">
+                                <div class="user-info">
+                                    <div class="user-name">${user.name}</div>
+                                    <div class="user-title">${user.title || ''}</div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    document.getElementById('usersList').innerHTML = html;
+                } else {
+                    document.getElementById('usersList').innerHTML = `
+                        <div class="empty-search">
+                            <i class="bi bi-search" style="font-size: 48px; margin-bottom: 1rem;"></i>
+                            <p>{% trans "No se encontraron usuarios" %}</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error searching users:', error);
+            });
+    }, 300);
+}
+
+// ========== DROPDOWN OPCIONES (3 PUNTOS) ==========
+function toggleOptionsDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('optionsDropdown');
+    const button = event.currentTarget;
+    const rect = button.getBoundingClientRect();
+    
+    dropdown.classList.toggle('active');
+    
+    if (dropdown.classList.contains('active')) {
+        dropdown.style.top = (rect.bottom + 5) + 'px';
+        dropdown.style.left = (rect.left - 150) + 'px';
+        document.addEventListener('click', closeOptionsDropdownOutside);
+    } else {
+        document.removeEventListener('click', closeOptionsDropdownOutside);
+    }
+}
+
+function closeOptionsDropdown() {
+    const dropdown = document.getElementById('optionsDropdown');
+    dropdown.classList.remove('active');
+    document.removeEventListener('click', closeOptionsDropdownOutside);
+}
+
+function closeOptionsDropdownOutside(event) {
+    const dropdown = document.getElementById('optionsDropdown');
+    if (!dropdown.contains(event.target)) {
+        closeOptionsDropdown();
+    }
+}
+
+// ========== FUNCIONES DE OPCIONES ==========
+function marcarTodosLeidos() {
+    fetch('/api/messages/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.querySelectorAll('.unread-badge').forEach(badge => badge.remove());
+            closeOptionsDropdown();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function ordenarPorFecha() {
+    window.location.href = window.location.pathname + '?sort=date';
+    closeOptionsDropdown();
+}
+
+function configuracionMensajes() {
+    window.location.href = '/messages/';
+    closeOptionsDropdown();
+}
+
+// Cerrar modales con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (document.getElementById('newMessageModal').classList.contains('active')) {
+            closeNewMessageModal();
+        }
+        if (document.getElementById('optionsDropdown').classList.contains('active')) {
+            closeOptionsDropdown();
+        }
+    }
+});
+</script>
+{% endblock %}

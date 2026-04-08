@@ -1,0 +1,593 @@
+# English translation for Linking X
+# Copyright (C) 2024 Linking X
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Linking X\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 00:00+0000\n"
+"PO-Revision-Date: 2026-03-18 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# base.html
+msgid "Linking X - Red profesional para conectar empresas y estudiantes"
+msgstr "Linking X - Professional network connecting companies and students"
+
+msgid "Volver"
+msgstr "Back"
+
+msgid "Buscar"
+msgstr "Search"
+
+msgid "Ver perfil"
+msgstr "View profile"
+
+msgid "Cerrar sesión"
+msgstr "Log out"
+
+msgid "Iniciar sesión"
+msgstr "Log in"
+
+msgid "Registrarse"
+msgstr "Sign up"
+
+msgid "Todos los derechos reservados."
+msgstr "All rights reserved."
+
+msgid "Idioma"
+msgstr "Language"
+
+# feed_home.html
+msgid "Feed - Linking X"
+msgstr "Feed - Linking X"
+
+msgid "Mi perfil"
+msgstr "My profile"
+
+msgid "Empleos"
+msgstr "Jobs"
+
+msgid "Mensajes"
+msgstr "Messages"
+
+msgid "Guardados"
+msgstr "Saved"
+
+msgid "Configuración"
+msgstr "Settings"
+
+msgid "Preferencias"
+msgstr "Preferences"
+
+msgid "Privacidad"
+msgstr "Privacy"
+
+msgid "¿Qué quieres compartir?"
+msgstr "What do you want to share?"
+
+msgid "Foto"
+msgstr "Photo"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Artículo"
+msgstr "Article"
+
+msgid "Siguiendo"
+msgstr "Following"
+
+msgid "Seguir"
+msgstr "Follow"
+
+msgid "Me gusta"
+msgstr "Like"
+
+msgid "Comentar"
+msgstr "Comment"
+
+msgid "Compartir"
+msgstr "Share"
+
+msgid "Publicar"
+msgstr "Post"
+
+msgid "Escribe un comentario..."
+msgstr "Write a comment..."
+
+msgid "Responder"
+msgstr "Reply"
+
+msgid "Ver más comentarios"
+msgstr "View more comments"
+
+msgid "Publicaciones"
+msgstr "Posts"
+
+msgid "Nueva publicación"
+msgstr "New post"
+
+msgid "¿Qué quieres publicar?"
+msgstr "What do you want to post?"
+
+msgid "Sugerencias para ti"
+msgstr "Suggestions for you"
+
+msgid "No hay publicaciones aún"
+msgstr "No posts yet"
+
+msgid "Crea una publicación"
+msgstr "Create a post"
+
+msgid "hace"
+msgstr "ago"
+
+msgid "Responder comentario"
+msgstr "Reply to comment"
+
+# profiles
+msgid "Editar perfil"
+msgstr "Edit profile"
+
+msgid "Mensaje"
+msgstr "Message"
+
+msgid "Seguidores"
+msgstr "Followers"
+
+msgid "Conexiones"
+msgstr "Connections"
+
+msgid "Acerca de"
+msgstr "About"
+
+msgid "Editar"
+msgstr "Edit"
+
+msgid "Agregar"
+msgstr "Add"
+
+msgid "Actualidad"
+msgstr "Present"
+
+msgid "Experiencia"
+msgstr "Experience"
+
+msgid "Educación"
+msgstr "Education"
+
+msgid "Habilidades"
+msgstr "Skills"
+
+msgid "Información de contacto"
+msgstr "Contact information"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+msgid "GitHub"
+msgstr "GitHub"
+
+msgid "Portafolio"
+msgstr "Portfolio"
+
+msgid "Visitar sitio"
+msgstr "Visit site"
+
+msgid "Publicidad"
+msgstr "Advertising"
+
+msgid "Promociona tu empresa en Linking X"
+msgstr "Promote your company on Linking X"
+
+msgid "Más información"
+msgstr "More information"
+
+msgid "Gestionar empleos"
+msgstr "Manage jobs"
+
+msgid "Empleos activos"
+msgstr "Active jobs"
+
+msgid "Empleados"
+msgstr "Employees"
+
+msgid "Acerca de la empresa"
+msgstr "About the company"
+
+msgid "Sin descripción"
+msgstr "No description"
+
+msgid "Sector"
+msgstr "Industry"
+
+msgid "Tamaño de la empresa"
+msgstr "Company size"
+
+msgid "Fundada en"
+msgstr "Founded in"
+
+msgid "Sitio web"
+msgstr "Website"
+
+msgid "Empleos publicados"
+msgstr "Posted jobs"
+
+msgid "Ver todos"
+msgstr "See all"
+
+msgid "Activa"
+msgstr "Active"
+
+msgid "No hay empleos publicados"
+msgstr "No jobs posted"
+
+msgid "Publicar empleo"
+msgstr "Post a job"
+
+msgid "Teléfono"
+msgstr "Phone"
+
+msgid "Facebook"
+msgstr "Facebook"
+
+msgid "Ver página"
+msgstr "View page"
+
+msgid "Instagram"
+msgstr "Instagram"
+
+# auth/login.html
+msgid "Iniciar Sesión - Linking X"
+msgstr "Log In - Linking X"
+
+msgid "Iniciar Sesión"
+msgstr "Log In"
+
+msgid "Conecta con tu futuro profesional"
+msgstr "Connect with your professional future"
+
+msgid "Correo electrónico"
+msgstr "Email address"
+
+msgid "Contraseña"
+msgstr "Password"
+
+msgid "¿Olvidaste tu contraseña?"
+msgstr "Forgot your password?"
+
+msgid "o"
+msgstr "or"
+
+msgid "¿No tienes cuenta?"
+msgstr "Don't have an account?"
+
+msgid "Regístrate"
+msgstr "Sign up"
+
+msgid "Conectando talento con oportunidades. Tu futuro profesional comienza aquí."
+msgstr "Connecting talent with opportunities. Your professional future starts here."
+
+# forms.py
+msgid "Ej: Desarrollador Full Stack Senior"
+msgstr "E.g.: Senior Full Stack Developer"
+
+msgid "Describe el puesto, qué buscan y qué ofrecen..."
+msgstr "Describe the position, what you're looking for and what you offer..."
+
+msgid "Lista los requisitos, uno por línea..."
+msgstr "List requirements, one per line..."
+
+msgid "Describe las responsabilidades del puesto..."
+msgstr "Describe the responsibilities of the position..."
+
+msgid "Título del puesto"
+msgstr "Job title"
+
+msgid "Descripción"
+msgstr "Description"
+
+msgid "Requisitos"
+msgstr "Requirements"
+
+msgid "Responsabilidades"
+msgstr "Responsibilities"
+
+msgid "Nivel de experiencia"
+msgstr "Experience level"
+
+msgid "Tipo de empleo"
+msgstr "Employment type"
+
+msgid "Modalidad de trabajo"
+msgstr "Work modality"
+
+msgid "Ubicación"
+msgstr "Location"
+
+msgid "Salario mínimo (USD)"
+msgstr "Minimum salary (USD)"
+
+msgid "Salario máximo (USD)"
+msgstr "Maximum salary (USD)"
+
+msgid "Mostrar salario públicamente"
+msgstr "Show salary publicly"
+
+msgid "Nombres"
+msgstr "First name(s)"
+
+msgid "Apellidos"
+msgstr "Last name(s)"
+
+msgid "Juan Carlos"
+msgstr "John"
+
+msgid "Pérez García"
+msgstr "Smith"
+
+msgid "Cédula de identidad"
+msgstr "National ID"
+
+msgid "Solo números, sin puntos ni guiones"
+msgstr "Numbers only, no dots or dashes"
+
+msgid "Fecha de nacimiento"
+msgstr "Date of birth"
+
+msgid "Género"
+msgstr "Gender"
+
+msgid "Mínimo 8 caracteres"
+msgstr "Minimum 8 characters"
+
+msgid "Confirmar contraseña"
+msgstr "Confirm password"
+
+msgid "Correo electrónico corporativo"
+msgstr "Corporate email address"
+
+msgid "Nombre de la empresa"
+msgstr "Company name"
+
+msgid "RIF"
+msgstr "Tax ID"
+
+msgid "Formato: J-XXXXXXXXX"
+msgstr "Format: J-XXXXXXXXX"
+
+msgid "Tipo de empresa"
+msgstr "Company type"
+
+msgid "Cuéntanos sobre ti, tus objetivos profesionales..."
+msgstr "Tell us about yourself, your professional goals..."
+
+msgid "Descripción corta de tu empresa"
+msgstr "Short description of your company"
+
+msgid "Descripción detallada de tu empresa, misión, visión..."
+msgstr "Detailed description of your company, mission, vision..."
+
+msgid "Python, Django, React..."
+msgstr "Python, Django, React..."
+
+msgid "Ej: Python, Django, React..."
+msgstr "E.g.: Python, Django, React..."
+
+msgid "Habilidad"
+msgstr "Skill"
+
+msgid "Nivel de dominio"
+msgstr "Proficiency level"
+
+msgid "Ej: Universidad Central de Venezuela"
+msgstr "E.g.: University of Oxford"
+
+msgid "Ej: Ingeniería en Computación"
+msgstr "E.g.: Computer Science Engineering"
+
+msgid "Ej: Ciencias de la Computación"
+msgstr "E.g.: Computer Science"
+
+msgid "Describe tu formación académica, logros, proyectos..."
+msgstr "Describe your academic background, achievements, projects..."
+
+msgid "Institución educativa"
+msgstr "Educational institution"
+
+msgid "Título obtenido"
+msgstr "Degree obtained"
+
+msgid "Campo de estudio"
+msgstr "Field of study"
+
+msgid "Fecha de inicio"
+msgstr "Start date"
+
+msgid "Fecha de finalización"
+msgstr "End date"
+
+msgid "Actualmente estudiando"
+msgstr "Currently studying"
+
+msgid "Descripción (opcional)"
+msgstr "Description (optional)"
+
+msgid "Ej: Tech Solutions CA"
+msgstr "E.g.: Tech Solutions Ltd"
+
+msgid "Ej: Desarrollador Full Stack"
+msgstr "E.g.: Full Stack Developer"
+
+msgid "Describe tus responsabilidades, logros y proyectos..."
+msgstr "Describe your responsibilities, achievements and projects..."
+
+msgid "Empresa"
+msgstr "Company"
+
+msgid "Cargo"
+msgstr "Position"
+
+msgid "Modalidad"
+msgstr "Modality"
+
+msgid "Trabajo actual"
+msgstr "Current job"
+
+# views
+msgid "No tienes permiso para editar este perfil"
+msgstr "You don't have permission to edit this profile"
+
+msgid "Perfil actualizado exitosamente"
+msgstr "Profile updated successfully"
+
+# jobs
+msgid "Ofertas de empleo"
+msgstr "Job listings"
+
+msgid "Nueva oferta"
+msgstr "New listing"
+
+msgid "Aplicar"
+msgstr "Apply"
+
+msgid "Ver detalles"
+msgstr "View details"
+
+msgid "Publicar oferta"
+msgstr "Post job"
+
+msgid "Mis candidatos"
+msgstr "My applicants"
+
+msgid "Gestionar ofertas"
+msgstr "Manage listings"
+
+msgid "Editar oferta"
+msgstr "Edit listing"
+
+msgid "Eliminar"
+msgstr "Delete"
+
+msgid "Candidatos"
+msgstr "Applicants"
+
+msgid "No hay ofertas disponibles"
+msgstr "No job listings available"
+
+msgid "Postulación enviada exitosamente"
+msgstr "Application submitted successfully"
+
+# messages
+msgid "Conversaciones"
+msgstr "Conversations"
+
+msgid "Nueva conversación"
+msgstr "New conversation"
+
+msgid "Enviar mensaje"
+msgstr "Send message"
+
+msgid "Escribe un mensaje..."
+msgstr "Write a message..."
+
+msgid "Enviar"
+msgstr "Send"
+
+msgid "No hay conversaciones"
+msgstr "No conversations"
+
+# add_section
+msgid "Agregar experiencia"
+msgstr "Add experience"
+
+msgid "Agregar educación"
+msgstr "Add education"
+
+msgid "Agregar habilidad"
+msgstr "Add skill"
+
+msgid "Guardar"
+msgstr "Save"
+
+msgid "Cancelar"
+msgstr "Cancel"
+
+msgid "Guardado con éxito"
+msgstr "Saved successfully"
+
+# New strings
+msgid "ejemplo@linkingx.com"
+msgstr "example@linkingx.com"
+
+msgid "ejemplo@gmail.com"
+msgstr "example@gmail.com"
+
+msgid "12345678"
+msgstr "12345678"
+
+msgid "contacto@empresa.com"
+msgstr "contact@company.com"
+
+msgid "Tech Solutions CA"
+msgstr "Tech Solutions Ltd"
+
+msgid "J-123456789"
+msgstr "J-123456789"
+
+msgid "1000"
+msgstr "1000"
+
+msgid "3000"
+msgstr "3000"
+
+msgid "Ej: Caracas, Venezuela"
+msgstr "E.g.: Caracas, Venezuela"
+
+msgid "Cuéntanos sobre ti..."
+msgstr "Tell us about yourself..."
+
+msgid "[Comentario bloqueado por el Administrador]"
+msgstr "[Comment blocked by the Administrator]"
+
+msgid "Respondiendo a"
+msgstr "Replying to"
+
+msgid "Sé el primero en compartir algo"
+msgstr "Be the first to share something"
+
+msgid "Personas que quizás conozcas"
+msgstr "People you may know"
+
+msgid "No hay sugerencias"
+msgstr "No suggestions"
+
+msgid "Cualquiera"
+msgstr "Anyone"
+
+msgid "¿Sobre qué quieres hablar?"
+msgstr "What do you want to talk about?"
+
+msgid "Añadir foto"
+msgstr "Add photo"
+
+msgid "Añadir video"
+msgstr "Add video"
+
+msgid "Escribe tu respuesta..."
+msgstr "Write your response..."
+
+msgid "comentarios"
+msgstr "comments"
+
+msgid "Ciudad, País"
+msgstr "City, Country"

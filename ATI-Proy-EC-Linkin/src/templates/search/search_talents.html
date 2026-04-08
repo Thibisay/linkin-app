@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Buscar Talento" %} - Linking X{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-talent-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .search-layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+    }
+    
+    /* Reutilizar estilos de filters-sidebar del template anterior */
+    .filters-sidebar {
+        position: sticky;
+        top: 80px;
+        height: fit-content;
+    }
+    
+    .filters-card {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .filters-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-input,
+    .filter-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .btn-apply-filters {
+        width: 100%;
+        padding: 0.75rem;
+        background: #0A66C2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+    
+    .btn-clear-filters {
+        width: 100%;
+        padding: 0.75rem;
+        background: white;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+    }
+    
+    /* Talent Card */
+    .talent-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .talent-card:hover {
+        border-color: #0A66C2;
+        box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15);
+    }
+    
+    .talent-header {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .talent-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .talent-info {
+        flex: 1;
+    }
+    
+    .talent-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+        text-decoration: none;
+    }
+    
+    .talent-name:hover {
+        color: #0A66C2;
+    }
+    
+    .talent-title {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+    
+    .talent-location {
+        font-size: 14px;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .talent-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .talent-description {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+    
+    .talent-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .skill-badge {
+        padding: 0.375rem 0.75rem;
+        background: #E7F3FF;
+        color: #0A66C2;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    
+    .talent-experience {
+        display: flex;
+        gap: 2rem;
+        font-size: 13px;
+        color: #6b7280;
+    }
+    
+    .experience-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .results-area {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        padding: 1.5rem;
+    }
+    
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .results-count {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+    
+    /* Responsive */
+    @media (max-width: 991px) {
+        .search-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .filters-sidebar {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-talent-container">
+    <div class="search-layout">
+        
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+            <div class="filters-card">
+                <h2 class="filters-title">{% trans "Filtros de búsqueda" %}</h2>
+                
+                <form method="get" action="{% url 'search_talent' %}">
+                    
+                    <!-- Búsqueda general -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Búsqueda general" %}</label>
+                        <input 
+                            type="text" 
+                            name="q" 
+                            class="filter-input" 
+                            placeholder="{% trans 'Nombre, título, descripción...' %}"
+                            value="{{ filter.form.q.value|default:'' }}"
+                        >
+                    </div>
+                    
+                    <!-- Habilidad específica -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Habilidad específica" %}</label>
+                        <input 
+                            type="text" 
+                            name="habilidad" 
+                            class="filter-input" 
+                            placeholder="{% trans 'Django, Python, React...' %}"
+                            value="{{ filter.form.habilidad.value|default:'' }}"
+                        >
+                        <small class="text-muted">{% trans "Busca por habilidad exacta" %}</small>
+                    </div>
+                    
+                    <!-- Ubicación -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Ubicación" %}</label>
+                        <input 
+                            type="text" 
+                            name="ubicacion" 
+                            class="filter-input" 
+                            placeholder="{% trans 'Ciudad o país' %}"
+                            value="{{ filter.form.ubicacion.value|default:'' }}"
+                        >
+                    </div>
+                    
+                    <!-- Años de experiencia mínimos -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Años de experiencia mínimos" %}</label>
+                        <input 
+                            type="number" 
+                            name="anos_experiencia_min" 
+                            class="filter-input" 
+                            placeholder="{% trans 'Ej: 3' %}"
+                            min="0"
+                            value="{{ filter.form.anos_experiencia_min.value|default:'' }}"
+                        >
+                    </div>
+                    
+                    <!-- Género -->
+                    <div class="filter-group">
+                        <label class="filter-label">{% trans "Género" %}</label>
+                        <select name="genero" class="filter-select">
+                            <option value="">{% trans "Todos" %}</option>
+                            {% for value, label in filter.form.genero.field.choices %}
+                                <option value="{{ value }}" {% if filter.form.genero.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn-apply-filters">
+                        <i class="bi bi-search me-2"></i>
+                        {% trans "Buscar talento" %}
+                    </button>
+                    
+                    <a href="{% url 'search_talent' %}" class="btn-clear-filters">
+                        {% trans "Limpiar filtros" %}
+                    </a>
+                    
+                </form>
+            </div>
+            
+            <div class="filters-card" style="background: #E7F3FF; border-color: #0A66C2;">
+                <div style="text-align: center;">
+                    <i class="bi bi-lightbulb" style="font-size: 32px; color: #0A66C2;"></i>
+                    <p style="margin-top: 0.5rem; font-size: 13px; color: #374151;">
+                        {% trans "Usa filtros específicos para encontrar el talento perfecto para tu equipo" %}
+                    </p>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Results Area -->
+        <main class="results-area">
+            
+            <div class="results-header">
+                <div class="results-count">
+                    {{ total_results }} {% trans "profesionales encontrados" %}
+                </div>
+            </div>
+            
+            <!-- Talent Cards -->
+            {% for prof in profesionales %}
+            <div class="talent-card">
+                <div class="talent-header">
+                    <img src="{{ prof.user.get_avatar_url }}" alt="Avatar" class="talent-avatar">
+                    <div class="talent-info">
+                        <a href="{% url 'profile_detail' prof.user.id %}" class="talent-name">
+                            {{ prof.user.get_full_name }}
+                        </a>
+                        {% if prof.titulo_actual %}
+                        <div class="talent-title">{{ prof.titulo_actual }}</div>
+                        {% endif %}
+                        {% if prof.user.ubicacion %}
+                        <div class="talent-location">
+                            <i class="bi bi-geo-alt"></i> {{ prof.user.ubicacion }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="talent-actions">
+                        <a href="{% url 'profile_detail' prof.user.id %}" class="btn btn-outline-primary">
+                            {% trans "Ver perfil" %}
+                        </a>
+                        <a href="{% url 'create_conversation' prof.user.id %}" class="btn btn-primary">
+                            <i class="bi bi-chat-dots"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                {% if prof.descripcion_personal %}
+                <div class="talent-description">
+                    {{ prof.descripcion_personal|truncatewords:30 }}
+                </div>
+                {% endif %}
+                
+                {% if prof.habilidades.all %}
+                <div class="talent-skills">
+                    {% for habilidad in prof.habilidades.all|slice:":6" %}
+                    <span class="skill-badge">{{ habilidad.nombre }}</span>
+                    {% endfor %}
+                    {% if prof.habilidades.count > 6 %}
+                    <span class="skill-badge">+{{ prof.habilidades.count|add:"-6" }} más</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="talent-experience">
+                    <div class="experience-item">
+                        <i class="bi bi-briefcase"></i>
+                        <span>{{ prof.experiencias.count }} {% trans "experiencias" %}</span>
+                    </div>
+                    <div class="experience-item">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>{{ prof.educaciones.count }} {% trans "educación" %}</span>
+                    </div>
+                    {% if prof.habilidades.count > 0 %}
+                    <div class="experience-item">
+                        <i class="bi bi-star"></i>
+                        <span>{{ prof.habilidades.count }} {% trans "habilidades" %}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="bi bi-person-x" style="font-size: 64px;"></i>
+                <h3>{% trans "No se encontraron profesionales" %}</h3>
+                <p>{% trans "Intenta ajustar los filtros de búsqueda" %}</p>
+            </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if profesionales.has_other_pages %}
+            <div class="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+                {% if profesionales.has_previous %}
+                <a href="?page={{ profesionales.previous_page_number }}&{{ request.GET.urlencode }}" class="page-link" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none; color: #374151;">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                {% endif %}
+                
+                {% for num in profesionales.paginator.page_range %}
+                    {% if profesionales.number == num %}
+                    <span class="page-link active" style="padding: 0.5rem 1rem; border: 1px solid #0A66C2; background: #0A66C2; color: white; border-radius: 6px;">{{ num }}</span>
+                    {% elif num > profesionales.number|add:'-3' and num < profesionales.number|add:'3' %}
+                    <a href="?page={{ num }}&{{ request.GET.urlencode }}" class="page-link" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none; color: #374151;">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if profesionales.has_next %}
+                <a href="?page={{ profesionales.next_page_number }}&{{ request.GET.urlencode }}" class="page-link" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none; color: #374151;">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+        </main>
+        
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,590 @@
+# Tradução em Português para Linking X
+# Copyright (C) 2024 Linking X
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Linking X\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 00:00+0000\n"
+"PO-Revision-Date: 2026-03-18 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Português\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# base.html
+msgid "Linking X - Red profesional para conectar empresas y estudiantes"
+msgstr "Linking X - Rede profissional para conectar empresas e estudantes"
+
+msgid "Volver"
+msgstr "Voltar"
+
+msgid "Buscar"
+msgstr "Pesquisar"
+
+msgid "Ver perfil"
+msgstr "Ver perfil"
+
+msgid "Cerrar sesión"
+msgstr "Sair"
+
+msgid "Iniciar sesión"
+msgstr "Entrar"
+
+msgid "Registrarse"
+msgstr "Cadastrar-se"
+
+msgid "Todos los derechos reservados."
+msgstr "Todos os direitos reservados."
+
+msgid "Idioma"
+msgstr "Idioma"
+
+# feed_home.html
+msgid "Feed - Linking X"
+msgstr "Feed - Linking X"
+
+msgid "Mi perfil"
+msgstr "Meu perfil"
+
+msgid "Empleos"
+msgstr "Empregos"
+
+msgid "Mensajes"
+msgstr "Mensagens"
+
+msgid "Guardados"
+msgstr "Salvos"
+
+msgid "Configuración"
+msgstr "Configurações"
+
+msgid "Preferencias"
+msgstr "Preferências"
+
+msgid "Privacidad"
+msgstr "Privacidade"
+
+msgid "¿Qué quieres compartir?"
+msgstr "O que você quer compartilhar?"
+
+msgid "Foto"
+msgstr "Foto"
+
+msgid "Video"
+msgstr "Vídeo"
+
+msgid "Artículo"
+msgstr "Artigo"
+
+msgid "Siguiendo"
+msgstr "Seguindo"
+
+msgid "Seguir"
+msgstr "Seguir"
+
+msgid "Me gusta"
+msgstr "Curtir"
+
+msgid "Comentar"
+msgstr "Comentar"
+
+msgid "Compartir"
+msgstr "Compartilhar"
+
+msgid "Publicar"
+msgstr "Publicar"
+
+msgid "Escribe un comentario..."
+msgstr "Escreva um comentário..."
+
+msgid "Responder"
+msgstr "Responder"
+
+msgid "Ver más comentarios"
+msgstr "Ver mais comentários"
+
+msgid "Publicaciones"
+msgstr "Publicações"
+
+msgid "Nueva publicación"
+msgstr "Nova publicação"
+
+msgid "¿Qué quieres publicar?"
+msgstr "O que você quer publicar?"
+
+msgid "Sugerencias para ti"
+msgstr "Sugestões para você"
+
+msgid "No hay publicaciones aún"
+msgstr "Ainda não há publicações"
+
+msgid "Crea una publicación"
+msgstr "Criar uma publicação"
+
+msgid "hace"
+msgstr "atrás"
+
+msgid "Responder comentario"
+msgstr "Responder comentário"
+
+# profiles
+msgid "Editar perfil"
+msgstr "Editar perfil"
+
+msgid "Mensaje"
+msgstr "Mensagem"
+
+msgid "Seguidores"
+msgstr "Seguidores"
+
+msgid "Conexiones"
+msgstr "Conexões"
+
+msgid "Acerca de"
+msgstr "Sobre"
+
+msgid "Editar"
+msgstr "Editar"
+
+msgid "Agregar"
+msgstr "Adicionar"
+
+msgid "Actualidad"
+msgstr "Atualmente"
+
+msgid "Experiencia"
+msgstr "Experiência"
+
+msgid "Educación"
+msgstr "Educação"
+
+msgid "Habilidades"
+msgstr "Habilidades"
+
+msgid "Información de contacto"
+msgstr "Informações de contato"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+msgid "GitHub"
+msgstr "GitHub"
+
+msgid "Portafolio"
+msgstr "Portfólio"
+
+msgid "Visitar sitio"
+msgstr "Visitar site"
+
+msgid "Publicidad"
+msgstr "Publicidade"
+
+msgid "Promociona tu empresa en Linking X"
+msgstr "Promova sua empresa no Linking X"
+
+msgid "Más información"
+msgstr "Mais informações"
+
+msgid "Gestionar empleos"
+msgstr "Gerenciar empregos"
+
+msgid "Empleos activos"
+msgstr "Vagas ativas"
+
+msgid "Empleados"
+msgstr "Funcionários"
+
+msgid "Acerca de la empresa"
+msgstr "Sobre a empresa"
+
+msgid "Sin descripción"
+msgstr "Sem descrição"
+
+msgid "Sector"
+msgstr "Setor"
+
+msgid "Tamaño de la empresa"
+msgstr "Tamanho da empresa"
+
+msgid "Fundada en"
+msgstr "Fundada em"
+
+msgid "Sitio web"
+msgstr "Site"
+
+msgid "Empleos publicados"
+msgstr "Vagas publicadas"
+
+msgid "Ver todos"
+msgstr "Ver todos"
+
+msgid "Activa"
+msgstr "Ativa"
+
+msgid "No hay empleos publicados"
+msgstr "Nenhuma vaga publicada"
+
+msgid "Publicar empleo"
+msgstr "Publicar vaga"
+
+msgid "Teléfono"
+msgstr "Telefone"
+
+msgid "Facebook"
+msgstr "Facebook"
+
+msgid "Ver página"
+msgstr "Ver página"
+
+msgid "Instagram"
+msgstr "Instagram"
+
+# auth/login.html
+msgid "Iniciar Sesión - Linking X"
+msgstr "Entrar - Linking X"
+
+msgid "Iniciar Sesión"
+msgstr "Entrar"
+
+msgid "Conecta con tu futuro profesional"
+msgstr "Conecte-se ao seu futuro profissional"
+
+msgid "Correo electrónico"
+msgstr "Endereço de e-mail"
+
+msgid "Contraseña"
+msgstr "Senha"
+
+msgid "¿Olvidaste tu contraseña?"
+msgstr "Esqueceu sua senha?"
+
+msgid "o"
+msgstr "ou"
+
+msgid "¿No tienes cuenta?"
+msgstr "Não tem uma conta?"
+
+msgid "Regístrate"
+msgstr "Cadastre-se"
+
+msgid "Conectando talento con oportunidades. Tu futuro profesional comienza aquí."
+msgstr "Conectando talentos com oportunidades. Seu futuro profissional começa aqui."
+
+# forms.py
+msgid "Ej: Desarrollador Full Stack Senior"
+msgstr "Ex.: Desenvolvedor Full Stack Sênior"
+
+msgid "Describe el puesto, qué buscan y qué ofrecen..."
+msgstr "Descreva a vaga, o que buscam e o que oferecem..."
+
+msgid "Lista los requisitos, uno por línea..."
+msgstr "Liste os requisitos, um por linha..."
+
+msgid "Describe las responsabilidades del puesto..."
+msgstr "Descreva as responsabilidades da vaga..."
+
+msgid "Ej: Caracas, Venezuela (Remoto)"
+msgstr "Ex.: São Paulo, Brasil (Remoto)"
+
+msgid "Título del puesto"
+msgstr "Título da vaga"
+
+msgid "Descripción"
+msgstr "Descrição"
+
+msgid "Requisitos"
+msgstr "Requisitos"
+
+msgid "Responsabilidades"
+msgstr "Responsabilidades"
+
+msgid "Nivel de experiencia"
+msgstr "Nível de experiência"
+
+msgid "Tipo de empleo"
+msgstr "Tipo de emprego"
+
+msgid "Modalidad de trabajo"
+msgstr "Modalidade de trabalho"
+
+msgid "Ubicación"
+msgstr "Localização"
+
+msgid "Salario mínimo (USD)"
+msgstr "Salário mínimo (USD)"
+
+msgid "Salario máximo (USD)"
+msgstr "Salário máximo (USD)"
+
+msgid "Mostrar salario públicamente"
+msgstr "Mostrar salário publicamente"
+
+msgid "Nombres"
+msgstr "Nome(s)"
+
+msgid "Apellidos"
+msgstr "Sobrenome(s)"
+
+msgid "Juan Carlos"
+msgstr "João Carlos"
+
+msgid "Pérez García"
+msgstr "Silva Santos"
+
+msgid "Cédula de identidad"
+msgstr "CPF / Documento de identidade"
+
+msgid "Solo números, sin puntos ni guiones"
+msgstr "Somente números, sem pontos ou traços"
+
+msgid "Fecha de nacimiento"
+msgstr "Data de nascimento"
+
+msgid "Género"
+msgstr "Gênero"
+
+msgid "Mínimo 8 caracteres"
+msgstr "Mínimo 8 caracteres"
+
+msgid "Confirmar contraseña"
+msgstr "Confirmar senha"
+
+msgid "Correo electrónico corporativo"
+msgstr "E-mail corporativo"
+
+msgid "Nombre de la empresa"
+msgstr "Nome da empresa"
+
+msgid "RIF"
+msgstr "CNPJ / Registro fiscal"
+
+msgid "Formato: J-XXXXXXXXX"
+msgstr "Formato: J-XXXXXXXXX"
+
+msgid "Tipo de empresa"
+msgstr "Tipo de empresa"
+
+msgid "Cuéntanos sobre ti, tus objetivos profesionales..."
+msgstr "Conte-nos sobre você, seus objetivos profissionais..."
+
+msgid "Descripción corta de tu empresa"
+msgstr "Descrição curta da sua empresa"
+
+msgid "Descripción detallada de tu empresa, misión, visión..."
+msgstr "Descrição detalhada da sua empresa, missão, visão..."
+
+msgid "Python, Django, React..."
+msgstr "Python, Django, React..."
+
+msgid "Ej: Python, Django, React..."
+msgstr "Ex.: Python, Django, React..."
+
+msgid "Habilidad"
+msgstr "Habilidade"
+
+msgid "Nivel de dominio"
+msgstr "Nível de domínio"
+
+msgid "Ej: Universidad Central de Venezuela"
+msgstr "Ex.: Universidade de São Paulo"
+
+msgid "Ej: Ingeniería en Computación"
+msgstr "Ex.: Engenharia de Computação"
+
+msgid "Ej: Ciencias de la Computación"
+msgstr "Ex.: Ciência da Computação"
+
+msgid "Describe tu formación académica, logros, proyectos..."
+msgstr "Descreva sua formação acadêmica, conquistas, projetos..."
+
+msgid "Institución educativa"
+msgstr "Instituição de ensino"
+
+msgid "Título obtenido"
+msgstr "Título obtido"
+
+msgid "Campo de estudio"
+msgstr "Área de estudo"
+
+msgid "Fecha de inicio"
+msgstr "Data de início"
+
+msgid "Fecha de finalización"
+msgstr "Data de conclusão"
+
+msgid "Actualmente estudiando"
+msgstr "Atualmente estudando"
+
+msgid "Descripción (opcional)"
+msgstr "Descrição (opcional)"
+
+msgid "Ej: Tech Solutions CA"
+msgstr "Ex.: Tech Solutions LTDA"
+
+msgid "Ej: Desarrollador Full Stack"
+msgstr "Ex.: Desenvolvedor Full Stack"
+
+msgid "Describe tus responsabilidades, logros y proyectos..."
+msgstr "Descreva suas responsabilidades, conquistas e projetos..."
+
+msgid "Empresa"
+msgstr "Empresa"
+
+msgid "Cargo"
+msgstr "Cargo"
+
+msgid "Modalidad"
+msgstr "Modalidade"
+
+msgid "Trabajo actual"
+msgstr "Emprego atual"
+
+# views
+msgid "No tienes permiso para editar este perfil"
+msgstr "Você não tem permissão para editar este perfil"
+
+msgid "Perfil actualizado exitosamente"
+msgstr "Perfil atualizado com sucesso"
+
+# jobs
+msgid "Ofertas de empleo"
+msgstr "Vagas de emprego"
+
+msgid "Nueva oferta"
+msgstr "Nova vaga"
+
+msgid "Aplicar"
+msgstr "Candidatar-se"
+
+msgid "Ver detalles"
+msgstr "Ver detalhes"
+
+msgid "Publicar oferta"
+msgstr "Publicar vaga"
+
+msgid "Mis candidatos"
+msgstr "Meus candidatos"
+
+msgid "Gestionar ofertas"
+msgstr "Gerenciar vagas"
+
+msgid "Editar oferta"
+msgstr "Editar vaga"
+
+msgid "Eliminar"
+msgstr "Excluir"
+
+msgid "Candidatos"
+msgstr "Candidatos"
+
+msgid "No hay ofertas disponibles"
+msgstr "Nenhuma vaga disponível"
+
+msgid "Postulación enviada exitosamente"
+msgstr "Candidatura enviada com sucesso"
+
+# messages
+msgid "Conversaciones"
+msgstr "Conversas"
+
+msgid "Nueva conversación"
+msgstr "Nova conversa"
+
+msgid "Enviar mensaje"
+msgstr "Enviar mensagem"
+
+msgid "Escribe un mensaje..."
+msgstr "Escreva uma mensagem..."
+
+msgid "Enviar"
+msgstr "Enviar"
+
+msgid "No hay conversaciones"
+msgstr "Nenhuma conversa"
+
+# add_section
+msgid "Agregar experiencia"
+msgstr "Adicionar experiência"
+
+msgid "Agregar educación"
+msgstr "Adicionar educação"
+
+msgid "Agregar habilidad"
+msgstr "Adicionar habilidade"
+
+msgid "Guardar"
+msgstr "Salvar"
+
+msgid "Cancelar"
+msgstr "Cancelar"
+
+msgid "Guardado con éxito"
+msgstr "Salvo com sucesso"
+
+# New strings
+msgid "ejemplo@linkingx.com"
+msgstr "exemplo@linkingx.com"
+
+msgid "ejemplo@gmail.com"
+msgstr "exemplo@gmail.com"
+
+msgid "12345678"
+msgstr "12345678"
+
+msgid "contacto@empresa.com"
+msgstr "contato@empresa.com"
+
+msgid "Tech Solutions CA"
+msgstr "Tech Solutions LTDA"
+
+msgid "J-123456789"
+msgstr "J-123456789"
+
+msgid "1000"
+msgstr "1000"
+
+msgid "3000"
+msgstr "3000"
+
+msgid "[Comentario bloqueado por el Administrador]"
+msgstr "[Comentário bloqueado pelo Administrador]"
+
+msgid "Respondiendo a"
+msgstr "Respondendo a"
+
+msgid "Sé el primero en compartir algo"
+msgstr "Seja o primeiro a compartilhar algo"
+
+msgid "Personas que quizás conozcas"
+msgstr "Pessoas que você talvez conheça"
+
+msgid "No hay sugerencias"
+msgstr "Não há sugestões"
+
+msgid "Cualquiera"
+msgstr "Qualquer pessoa"
+
+msgid "¿Sobre qué quieres hablar?"
+msgstr "Sobre o que você quer falar?"
+
+msgid "Añadir foto"
+msgstr "Adicionar foto"
+
+msgid "Añadir video"
+msgstr "Adicionar vídeo"
+
+msgid "Escribe tu respuesta..."
+msgstr "Escreva sua resposta..."
+
+msgid "comentarios"
+msgstr "comentários"
+
+msgid "Ciudad, País"
+msgstr "Cidade, País"

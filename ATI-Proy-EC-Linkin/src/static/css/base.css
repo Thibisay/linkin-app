@@ -1,0 +1,188 @@
+/* ============================================
+   LINKING X - BASE STYLES
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-gray-100);
+  color: var(--color-black-800);
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ========== TYPOGRAPHY ========== */
+
+h1,
+.h1 {
+  font-size: var(--mobile-h1-size);
+  line-height: var(--mobile-h1-line);
+  font-weight: var(--mobile-h1-weight);
+  letter-spacing: var(--mobile-h1-spacing);
+  color: var(--color-black-800);
+}
+
+h2,
+.h2 {
+  font-size: var(--mobile-h2-size);
+  line-height: var(--mobile-h2-line);
+  font-weight: var(--mobile-h2-weight);
+}
+
+h3,
+.h3 {
+  font-size: var(--mobile-h3-size);
+  line-height: var(--mobile-h3-line);
+  font-weight: var(--mobile-h3-weight);
+}
+
+p,
+.body {
+  font-size: var(--mobile-body-size);
+  line-height: var(--mobile-body-line);
+}
+
+small,
+.small {
+  font-size: var(--mobile-small-size);
+  line-height: var(--mobile-small-line);
+}
+
+.caption {
+  font-size: var(--mobile-caption-size);
+  line-height: var(--mobile-caption-line);
+  color: var(--color-gray-600);
+}
+
+/* Desktop Typography Override */
+@media (min-width: 1024px) {
+  h1,
+  .h1 {
+    font-size: var(--desktop-h1-size);
+    line-height: var(--desktop-h1-line);
+    letter-spacing: var(--desktop-h1-spacing);
+  }
+
+  h2,
+  .h2 {
+    font-size: var(--desktop-h2-size);
+    line-height: var(--desktop-h2-line);
+  }
+
+  h3,
+  .h3 {
+    font-size: var(--desktop-h3-size);
+    line-height: var(--desktop-h3-line);
+  }
+}
+
+/* ========== LINKS ========== */
+
+a {
+  color: var(--color-primary-700);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-info-600);
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--color-primary-700);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ========== LAYOUT ========== */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  padding: var(--space-4);
+}
+
+/* ========== UTILITY CLASSES ========== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-left {
+  text-align: left;
+}
+
+.mt-1 {
+  margin-top: var(--space-1);
+}
+.mt-2 {
+  margin-top: var(--space-2);
+}
+.mt-4 {
+  margin-top: var(--space-4);
+}
+.mt-6 {
+  margin-top: var(--space-6);
+}
+
+.mb-1 {
+  margin-bottom: var(--space-1);
+}
+.mb-2 {
+  margin-bottom: var(--space-2);
+}
+.mb-4 {
+  margin-bottom: var(--space-4);
+}
+.mb-6 {
+  margin-bottom: var(--space-6);
+}
+
+.hidden {
+  display: none;
+}
+.block {
+  display: block;
+}
+.flex {
+  display: flex;
+}
+.grid {
+  display: grid;
+}

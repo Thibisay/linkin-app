@@ -1,0 +1,74 @@
+# Directorios y archivos de Git
+.git/
+.gitignore
+.gitattributes
+
+# Entornos virtuales y dependencias Python
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Cache de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Archivos de desarrollo
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+*.db
+
+# El directorio staticfiles se genera con collectstatic, no se copia
+staticfiles/
+
+# Archivos de configuración local
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.secrets/
+
+# Dockerfiles adicionales
+Dockerfile.dev
+docker-compose.override.yml
+docker-compose.test.yml
+
+# IDE y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+\#*
+.\#*
+
+# Archivos de documentación
+docs/_build/
+
+# Archivos de cobertura y testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Archivos de construcción y distribución
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Backups
+*.bak
+*.backup

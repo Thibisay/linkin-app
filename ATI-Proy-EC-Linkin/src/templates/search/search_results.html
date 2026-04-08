@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Resultados de búsqueda" %} - Linking X{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .search-header {
+        margin-bottom: 2rem;
+    }
+    
+    .search-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .search-tabs {
+        display: flex;
+        gap: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .search-tab {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        text-decoration: none;
+    }
+    
+    .search-tab.active {
+        color: #0A66C2;
+        border-bottom-color: #0A66C2;
+    }
+    
+    .result-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .result-card:hover {
+        border-color: #0A66C2;
+        box-shadow: 0 2px 8px rgba(10, 102, 194, 0.15);
+    }
+    
+    .result-user {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .result-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .result-info {
+        flex: 1;
+    }
+    
+    .result-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        text-decoration: none;
+    }
+    
+    .result-name:hover {
+        color: #0A66C2;
+    }
+    
+    .result-title {
+        font-size: 14px;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    
+    /* Job cards */
+    .job-result-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    .job-result-card:hover {
+        border-color: #0A66C2;
+        box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15);
+    }
+    
+    .job-card-header {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .job-company-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .job-card-info {
+        flex: 1;
+    }
+    
+    .job-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+    }
+    
+    .job-card-company {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+    
+    .job-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 13px;
+        color: #6b7280;
+    }
+    
+    .job-card-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .job-tag {
+        padding: 0.25rem 0.75rem;
+        background: #f3f4f6;
+        color: #374151;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    
+    .job-tag.highlighted {
+        background: #E7F3FF;
+        color: #0A66C2;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    
+    <div class="search-header">
+        <h1 class="search-title">
+            {% if query %}
+                {% trans "Resultados para" %} "{{ query }}"
+            {% else %}
+                {% trans "Búsqueda" %}
+            {% endif %}
+        </h1>
+        
+        {% if query %}
+        <p class="text-muted">
+            {{ total_usuarios }} {% trans "usuarios" %} · 
+            {{ total_publicaciones }} {% trans "publicaciones" %} · 
+            {{ total_trabajos }} {% trans "trabajos" %}
+        </p>
+        {% endif %}
+    </div>
+    
+    <div class="search-tabs">
+        <a href="?q={{ query }}&tab=all" class="search-tab {% if tab == 'all' %}active{% endif %}">
+            {% trans "Todo" %}
+        </a>
+        <a href="?q={{ query }}&tab=users" class="search-tab {% if tab == 'users' %}active{% endif %}">
+            {% trans "Usuarios" %} ({{ total_usuarios }})
+        </a>
+        <a href="?q={{ query }}&tab=posts" class="search-tab {% if tab == 'posts' %}active{% endif %}">
+            {% trans "Publicaciones" %} ({{ total_publicaciones }})
+        </a>
+        <a href="?q={{ query }}&tab=jobs" class="search-tab {% if tab == 'jobs' %}active{% endif %}">
+            <i class="bi bi-briefcase me-1"></i>{% trans "Trabajos" %} ({{ total_trabajos }})
+        </a>
+    </div>
+    
+    {% if not query %}
+    <div class="empty-state">
+        <i class="bi bi-search" style="font-size: 64px;"></i>
+        <h3>{% trans "Busca contenido en Linking X" %}</h3>
+        <p>{% trans "Encuentra usuarios, publicaciones, trabajos y más" %}</p>
+    </div>
+    {% else %}
+        
+        <!-- Usuarios -->
+        {% if tab == 'all' or tab == 'users' %}
+            {% for usuario in usuarios %}
+            <div class="result-card">
+                <div class="result-user">
+                    <img src="{{ usuario.get_avatar_url }}" alt="Avatar" class="result-avatar">
+                    <div class="result-info">
+                        <a href="{% url 'profile_detail' usuario.id %}" class="result-name">
+                            {{ usuario.get_full_name }}
+                        </a>
+                        <div class="result-title">
+                            {% if usuario.tipo_usuario == 'profesional' and usuario.profesional.titulo_actual %}
+                                {{ usuario.profesional.titulo_actual }}
+                            {% elif usuario.tipo_usuario == 'empresa' and usuario.empresa.nombre_empresa %}
+                                {{ usuario.empresa.nombre_empresa }}
+                            {% endif %}
+                        </div>
+                        {% if usuario.ubicacion %}
+                        <div class="result-title">
+                            <i class="bi bi-geo-alt"></i> {{ usuario.ubicacion }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'profile_detail' usuario.id %}" class="btn btn-outline-primary">
+                        {% trans "Ver perfil" %}
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+                {% if tab == 'users' %}
+                <div class="empty-state">
+                    <i class="bi bi-person-x" style="font-size: 48px;"></i>
+                    <p>{% trans "No se encontraron usuarios" %}</p>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Publicaciones -->
+        {% if tab == 'all' or tab == 'posts' %}
+            {% for pub in publicaciones %}
+            <div class="result-card">
+                <div class="result-user" style="margin-bottom: 1rem;">
+                    <img src="{{ pub.autor.get_avatar_url }}" alt="Avatar" class="result-avatar" style="width: 40px; height: 40px;">
+                    <div class="result-info">
+                        <a href="{% url 'profile_detail' pub.autor.id %}" class="result-name" style="font-size: 16px;">
+                            {{ pub.autor.get_full_name }}
+                        </a>
+                        <div class="result-title">
+                            {{ pub.fecha_creacion|timesince }} {% trans "atrás" %}
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size: 15px; line-height: 1.5; color: #374151;">
+                    {{ pub.contenido|truncatewords:50 }}
+                </div>
+                <div style="margin-top: 1rem; font-size: 13px; color: #9ca3af;">
+                    {{ pub.num_likes }} {% trans "likes" %} · {{ pub.num_comentarios }} {% trans "comentarios" %}
+                </div>
+            </div>
+            {% empty %}
+                {% if tab == 'posts' %}
+                <div class="empty-state">
+                    <i class="bi bi-file-post" style="font-size: 48px;"></i>
+                    <p>{% trans "No se encontraron publicaciones" %}</p>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Trabajos -->
+        {% if tab == 'all' or tab == 'jobs' %}
+            {% for trabajo in trabajos %}
+            <a href="{% url 'job_detail' trabajo.id %}" class="job-result-card">
+                <div class="job-card-header">
+                    <img src="{{ trabajo.empresa.user.get_avatar_url }}" alt="Logo" class="job-company-logo">
+                    <div class="job-card-info">
+                        <h3 class="job-card-title">{{ trabajo.titulo }}</h3>
+                        <div class="job-card-company">{{ trabajo.empresa.nombre_empresa }}</div>
+                        <div class="job-card-meta">
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-geo-alt"></i> {{ trabajo.ubicacion }}
+                            </span>
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-briefcase"></i> {{ trabajo.get_tipo_empleo_display }}
+                            </span>
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-laptop"></i> {{ trabajo.get_modalidad_display }}
+                            </span>
+                            <span class="job-card-meta-item">
+                                <i class="bi bi-clock"></i> {{ trabajo.fecha_publicacion|timesince }} {% trans "atrás" %}
+                            </span>
+                        </div>
+                        <div style="margin-top: 0.75rem;">
+                            <span class="job-tag highlighted">{{ trabajo.get_nivel_display }}</span>
+                            {% if trabajo.salario_min and trabajo.mostrar_salario %}
+                            <span class="job-tag">${{ trabajo.salario_min|floatformat:0 }} - ${{ trabajo.salario_max|floatformat:0 }}</span>
+                            {% endif %}
+                            <span class="job-tag">{{ trabajo.num_postulaciones }} {% trans "aplicantes" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+                {% if tab == 'jobs' %}
+                <div class="empty-state">
+                    <i class="bi bi-briefcase" style="font-size: 48px;"></i>
+                    <p>{% trans "No se encontraron trabajos" %}</p>
+                    <a href="{% url 'search_jobs' %}?q={{ query }}" class="btn btn-primary">
+                        {% trans "Buscar con filtros avanzados" %}
+                    </a>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+    {% endif %}
+    
+</div>
+{% endblock %}

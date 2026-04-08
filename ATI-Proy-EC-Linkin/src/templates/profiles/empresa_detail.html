@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{{ empresa.nombre_empresa }} - Linking X{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    
+    <div class="profile-header-card">
+        <div class="cover-photo"></div>
+        <div class="profile-header-content">
+            <div class="profile-avatar-section">
+                <img src="{{ profile_user.get_avatar_url }}" alt="Logo" class="profile-avatar">
+            </div>
+            <h1 class="profile-name">{{ empresa.nombre_empresa }}</h1>
+            {% if empresa.sector %}
+            <p class="profile-title">{{ empresa.get_sector_display }}</p>
+            {% endif %}
+            {% if profile_user.ubicacion %}
+            <p class="profile-location">
+                <i class="bi bi-geo-alt"></i> {{ profile_user.ubicacion }}
+            </p>
+            {% endif %}
+            <div class="profile-actions">
+                {% if is_own_profile %}
+                    <a href="{% url 'profile_edit' user.id %}" class="btn btn-secondary">
+                        <i class="bi bi-pencil"></i> {% trans "Editar perfil" %}
+                    </a>
+                    <a href="{% url 'job_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-briefcase"></i> {% trans "Gestionar empleos" %}
+                    </a>
+                {% else %}
+                    <button type="button" class="btn btn-primary follow-btn {% if esta_siguiendo %}following{% endif %}"
+                        onclick="toggleFollow('{{ profile_user.id }}', this)">
+                        <i class="bi bi-building-add"></i>
+                        <span class="follow-text">
+                            {% if esta_siguiendo %}{% trans "Siguiendo" %}{% else %}{% trans "Seguir" %}{% endif %}
+                        </span>
+                    </button>
+                    <a href="{% url 'create_conversation' profile_user.id %}" class="btn btn-secondary">
+                        <i class="bi bi-chat-dots"></i> {% trans "Mensaje" %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="profile-stats-card">
+        <div class="stat-item">
+            <div class="stat-value" id="seguidoresCount">{{ total_seguidores }}</div>
+            <div class="stat-label">{% trans "Seguidores" %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ ofertas_activas_count }}</div>
+            <div class="stat-label">{% trans "Empleos activos" %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ total_empleados|default:"—" }}</div>
+            <div class="stat-label">{% trans "Empleados" %}</div>
+        </div>
+    </div>
+    
+    <div class="profile-layout">
+        <div class="main-content">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Acerca de la empresa" %}</h2>
+                    {% if is_own_profile %}
+                    <a href="{% url 'profile_edit' user.id %}" class="section-action">
+                        <i class="bi bi-pencil"></i> {% trans "Editar" %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% if empresa.descripcion_completa %}
+                <div class="about-text">{{ empresa.descripcion_completa }}</div>
+                {% else %}
+                <div class="about-text" style="color:#9ca3af;font-style:italic;">{% trans "Sin descripción" %}</div>
+                {% endif %}
+                <div class="company-info-grid">
+                    {% if empresa.sector %}
+                    <div class="info-item">
+                        <div class="info-label">{% trans "Sector" %}</div>
+                        <div class="info-value">{{ empresa.get_sector_display }}</div>
+                    </div>
+                    {% endif %}
+                    {% if empresa.tamano %}
+                    <div class="info-item">
+                        <div class="info-label">{% trans "Tamaño de la empresa" %}</div>
+                        <div class="info-value">{{ empresa.get_tamano_display }}</div>
+                    </div>
+                    {% endif %}
+                    {% if empresa.fecha_fundacion %}
+                    <div class="info-item">
+                        <div class="info-label">{% trans "Fundada en" %}</div>
+                        <div class="info-value">{{ empresa.fecha_fundacion|date:"Y" }}</div>
+                    </div>
+                    {% endif %}
+                    {% if empresa.sitio_web %}
+                    <div class="info-item">
+                        <div class="info-label">{% trans "Sitio web" %}</div>
+                        <div class="info-value"><a href="{{ empresa.sitio_web }}" target="_blank">{{ empresa.sitio_web }}</a></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Empleos publicados" %}</h2>
+                    {% if is_own_profile %}
+                    <a href="{% url 'job_list' %}" class="section-action">{% trans "Ver todos" %} <i class="bi bi-arrow-right"></i></a>
+                    {% endif %}
+                </div>
+                {% if ofertas_publicadas %}
+                    {% for oferta in ofertas_publicadas %}
+                    <a href="{% url 'job_detail' oferta.id %}" class="job-item" style="text-decoration:none;color:inherit;">
+                        <div class="job-icon"><i class="bi bi-briefcase-fill"></i></div>
+                        <div class="job-content">
+                            <div class="job-title">{{ oferta.titulo }}</div>
+                            <div class="job-meta">
+                                <span><i class="bi bi-geo-alt"></i> {{ oferta.ubicacion }}</span>
+                                <span><i class="bi bi-clock"></i> {{ oferta.tipo_empleo }}</span>
+                                <span><i class="bi bi-laptop"></i> {{ oferta.modalidad }}</span>
+                            </div>
+                            {% if oferta.activa %}
+                            <span class="job-badge">
+                                <i class="bi bi-circle-fill" style="font-size:6px;"></i> {% trans "Activa" %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                <div style="text-align:center;padding:2rem;color:#9ca3af;">
+                    <i class="bi bi-inbox" style="font-size:48px;margin-bottom:1rem;display:block;"></i>
+                    <p>{% trans "No hay empleos publicados" %}</p>
+                    {% if is_own_profile %}
+                    <a href="{% url 'job_list' %}" class="btn btn-primary btn-sm" style="margin-top:1rem;">
+                        <i class="bi bi-plus-lg"></i> {% trans "Publicar empleo" %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <aside class="sidebar-content">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">{% trans "Información de contacto" %}</h2>
+                    {% if is_own_profile %}
+                    <a href="{% url 'profile_edit' user.id %}" class="section-action"><i class="bi bi-pencil"></i></a>
+                    {% endif %}
+                </div>
+                {% if empresa.email_contacto %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-envelope"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">{% trans "Email" %}</div>
+                        <div class="contact-value"><a href="mailto:{{ empresa.email_contacto }}">{{ empresa.email_contacto }}</a></div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if empresa.telefono %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-telephone"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">{% trans "Teléfono" %}</div>
+                        <div class="contact-value"><a href="tel:{{ empresa.telefono }}">{{ empresa.telefono }}</a></div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if empresa.sitio_web %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-globe"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">{% trans "Sitio web" %}</div>
+                        <div class="contact-value"><a href="{{ empresa.sitio_web }}" target="_blank">{% trans "Visitar sitio" %}</a></div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if empresa.linkedin_url %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-linkedin"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">LinkedIn</div>
+                        <div class="contact-value"><a href="{{ empresa.linkedin_url }}" target="_blank">{% trans "Ver perfil" %}</a></div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if empresa.facebook_url %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-facebook"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">Facebook</div>
+                        <div class="contact-value"><a href="{{ empresa.facebook_url }}" target="_blank">{% trans "Ver página" %}</a></div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if empresa.instagram_url %}
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="bi bi-instagram"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">Instagram</div>
+                        <div class="contact-value"><a href="{{ empresa.instagram_url }}" target="_blank">{% trans "Ver perfil" %}</a></div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <section class="ad-card hide-mobile">
+                <div class="ad-label">{% trans "Publicidad" %}</div>
+                <div class="ad-content">
+                    <div class="ad-placeholder"><span>LOGO</span></div>
+                    <p class="ad-text">{% trans "Promociona tu empresa en Linking X" %}</p>
+                    <button class="btn btn-secondary btn-block btn-sm">{% trans "Más información" %}</button>
+                </div>
+            </section>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = '{{ csrf_token }}';
+function toggleFollow(usuarioId, button) {
+    fetch(`/feed/user/${usuarioId}/follow/`, { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        .then(r => r.json()).then(data => {
+            if (data.success) {
+                const text = button.querySelector('.follow-text');
+                const icon = button.querySelector('i');
+                button.classList.toggle('following', data.siguiendo);
+                text.textContent = data.siguiendo ? '{% trans "Siguiendo" %}' : '{% trans "Seguir" %}';
+                icon.className = data.siguiendo ? 'bi bi-building-check' : 'bi bi-building-add';
+                const count = document.getElementById('seguidoresCount');
+                if (count) count.textContent = parseInt(count.textContent) + (data.siguiendo ? 1 : -1);
+            }
+        });
+}
+</script>
+{% endblock %}

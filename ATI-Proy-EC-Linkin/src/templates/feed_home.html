@@ -1,0 +1,792 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Feed - Linking X" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/feed.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="feed-container">
+    <div class="feed-layout">
+        
+        <!-- ========== SIDEBAR IZQUIERDO ========== -->
+        <aside class="left-sidebar">
+            <div class="profile-card">
+                <div class="profile-card-header"></div>
+                <div class="profile-card-body">
+                    <img src="{{ user.get_avatar_url }}" alt="Avatar" class="avatar-lg">
+                    <div class="profile-name">{{ user.get_full_name }}</div>
+                    <div class="profile-title">
+                        {% if user.tipo_usuario == 'profesional' and user.profesional.titulo_actual %}
+                            {{ user.profesional.titulo_actual }}
+                        {% elif user.tipo_usuario == 'empresa' and user.empresa.nombre_empresa %}
+                            {{ user.empresa.nombre_empresa }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="{% url 'profile_detail' user.id %}" class="menu-item">
+                    <i class="bi bi-person"></i>
+                    <span>{% trans "Mi perfil" %}</span>
+                </a>
+                <a href="{% url 'job_list' %}" class="menu-item">
+                    <i class="bi bi-briefcase"></i>
+                    <span>{% trans "Empleos" %}</span>
+                </a>
+                <a href="{% url 'message_list' %}" class="menu-item">
+                    <i class="bi bi-chat"></i>
+                    <span>{% trans "Mensajes" %}</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="bi bi-bookmark"></i>
+                    <span>{% trans "Guardados" %}</span>
+                </a>
+            </div>
+ 
+            <div class="settings-card">
+                <div class="settings-title">{% trans "Configuración" %}</div>
+                <div class="settings-item">
+                    <i class="bi bi-gear"></i>
+                    <span>{% trans "Preferencias" %}</span>
+                </div>
+                <!-- Selector de idioma -->
+                {% get_current_language as CURRENT_LANG %}
+                {% get_available_languages as LANGUAGES_LIST %}
+                <div class="dropdown">
+                    <div class="settings-item" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                        style="cursor:pointer; justify-content:space-between;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-globe"></i>
+                            <span>{% trans "Idioma" %}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <i class="bi bi-chevron-down" style="font-size:10px; color:#6b7280;"></i>
+                        </div>
+                    </div>
+                    <ul class="dropdown-menu shadow" style="min-width:160px;">
+                        <li>
+                            <h6 class="dropdown-header">{% trans "Idioma" %}</h6>
+                        </li>
+                        {% for lang_code, lang_name in LANGUAGES_LIST %}
+                        <li>
+                        <form id="lang-form-{{ lang_code }}" method="post" action="{% url 'set_language' %}" style="display: none;">
+                            {% csrf_token %}
+                            
+                            <!-- Determinar la URL de retorno -->
+                            {% with request.get_full_path as full_path %}
+                                {% if full_path|slice:'1:4' == 'en/' or full_path|slice:'1:4' == 'pt/' %}
+                                    <!-- Si tiene prefijo, quitarlo -->
+                                    <input type="hidden" name="next" value="/{{ full_path|slice:'4:' }}">
+                                {% else %}
+                                    <!-- Si no tiene prefijo, usar la ruta actual -->
+                                    <input type="hidden" name="next" value="{{ full_path }}">
+                                {% endif %}
+                            {% endwith %}
+                            
+                            <input type="hidden" name="language" value="{{ lang_code }}">
+                        </form>
+
+                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="#"
+                            onclick="document.getElementById('lang-form-{{ lang_code }}').submit(); return false;"
+                            style="{% if lang_code == CURRENT_LANG %}font-weight:700; color:#0A66C2;{% endif %}">
+                                <span>{{ lang_name }}</span>
+                                {% if lang_code == CURRENT_LANG %}
+                                    <i class="bi bi-check2" style="color:#0A66C2;"></i>
+                                {% endif %}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                    <div class="settings-item">
+                        <i class="bi bi-shield-check"></i>
+                        <span>{% trans "Privacidad" %}</span>
+                    </div>
+                </div>
+            </aside>
+        
+        <!-- ========== FEED CENTRAL ========== -->
+        <main class="feed-main">
+            
+            <!-- Crear Publicación -->
+            <div class="create-post-card">
+                <div class="create-post-input">
+                    <img src="{{ user.get_avatar_url }}" alt="Avatar" class="avatar-md">
+                    <button type="button" class="create-post-button" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                        {% trans "¿Qué quieres compartir?" %}
+                    </button>
+                </div>
+                <div class="create-post-actions">
+                    <button type="button" class="post-action-btn" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                        <i class="bi bi-image text-success"></i>
+                        <span>{% trans "Foto" %}</span>
+                    </button>
+                    <button type="button" class="post-action-btn" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                        <i class="bi bi-play-btn text-danger"></i>
+                        <span>{% trans "Video" %}</span>
+                    </button>
+                    <button type="button" class="post-action-btn" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                        <i class="bi bi-pencil text-primary"></i>
+                        <span>{% trans "Artículo" %}</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Publicaciones -->
+            {% for pub in publicaciones %}
+            <article class="post-card" data-post-id="{{ pub.id }}">
+                <!-- Header -->
+                <div class="post-header">
+                    <div class="post-author">
+                        <img src="{{ pub.autor.get_avatar_url }}" alt="Avatar" class="avatar-md">
+                        <div class="post-author-info">
+                            <a href="{% url 'profile_detail' pub.autor.id %}" class="post-author-name">
+                                {{ pub.autor.get_full_name }}
+                            </a>
+                            <div class="post-author-title">
+                                {% if pub.autor.tipo_usuario == 'profesional' and pub.autor.profesional.titulo_actual %}
+                                    {{ pub.autor.profesional.titulo_actual }}
+                                {% elif pub.autor.tipo_usuario == 'empresa' and pub.autor.empresa.nombre_empresa %}
+                                    {{ pub.autor.empresa.nombre_empresa }}
+                                {% endif %}
+                            </div>
+                            <div class="post-time">{{ pub.fecha_creacion|timesince }}</div>
+                        </div>
+                    </div>
+                    
+                    {% if pub.autor != user %}
+                    <button 
+                        type="button" 
+                        class="follow-btn {% if pub.usuario_sigue_autor %}following{% endif %}"
+                        onclick="toggleFollow('{{ pub.autor.id }}', this)"
+                    >
+                        <span class="follow-text">
+                            {% if pub.usuario_sigue_autor %}
+                                {% trans "Siguiendo" %}
+                            {% else %}
+                                {% trans "Seguir" %}
+                            {% endif %}
+                        </span>
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Contenido -->
+                {% if pub.contenido %}
+                <div class="post-content">{{ pub.contenido }}</div>
+                {% endif %}
+                
+                <!-- Media -->
+                {% if pub.imagen %}
+                <img src="{{ pub.imagen.url }}" alt="Imagen" class="post-media">
+                {% elif pub.video %}
+                <video src="{{ pub.video.url }}" controls class="post-media"></video>
+                {% endif %}
+                
+                <!-- Estadísticas -->
+                <div class="post-stats">
+                    <span class="likes-count">
+                        <i class="bi bi-hand-thumbs-up-fill text-primary"></i>
+                        <span data-likes="{{ pub.id }}">{{ pub.total_likes }}</span>
+                    </span>
+                    <span>
+                        <span data-comments="{{ pub.id }}">{{ pub.total_comentarios }}</span> {% trans "comentarios" %}
+                    </span>
+                </div>
+                
+                <!-- Acciones -->
+                <div class="post-actions">
+                    <button 
+                        type="button" 
+                        class="post-action {% if pub.usuario_dio_like %}liked{% endif %}"
+                        onclick="toggleLike('{{ pub.id }}', this)"
+                    >
+                        <i class="bi {% if pub.usuario_dio_like %}bi-hand-thumbs-up-fill{% else %}bi-hand-thumbs-up{% endif %}"></i>
+                        <span>{% trans "Me gusta" %}</span>
+                    </button>
+                    <button type="button" class="post-action" onclick="toggleComments('{{ pub.id }}')">
+                        <i class="bi bi-chat"></i>
+                        <span>{% trans "Comentar" %}</span>
+                    </button>
+                    <button type="button" class="post-action">
+                        <i class="bi bi-share"></i>
+                        <span>{% trans "Compartir" %}</span>
+                    </button>
+                </div>
+                
+                <!-- Sección de Comentarios -->
+                <div class="comments-section" id="comments-{{ pub.id }}">
+                    <!-- Formulario de comentario -->
+                    <form class="comment-form" onsubmit="submitComment(event, '{{ pub.id }}')" enctype="multipart/form-data" id="comment-form-{{ pub.id }}">
+                        <img src="{{ user.get_avatar_url }}" alt="Avatar" class="avatar-sm">
+                        <div class="comment-input-wrapper">
+                            <textarea 
+                                class="comment-input" 
+                                name="contenido"
+                                placeholder="{% trans 'Escribe un comentario...' %}"
+                                rows="1"
+                                oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; toggleCommentSubmit(this)"
+                            ></textarea>
+                            
+                            <!-- Preview de media -->
+                            <div class="comment-media-preview" id="comment-preview-{{ pub.id }}" style="display: none;">
+                                <button type="button" class="remove-comment-media" onclick="removeCommentMedia('{{ pub.id }}')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                <img id="comment-img-{{ pub.id }}" style="display: none;">
+                                <video id="comment-video-{{ pub.id }}" controls style="display: none;"></video>
+                            </div>
+                            
+                            <input type="file" name="imagen" id="comment-img-input-{{ pub.id }}" accept="image/*" style="display: none;" onchange="previewCommentMedia('{{ pub.id }}', 'image')">
+                            <input type="file" name="video" id="comment-video-input-{{ pub.id }}" accept="video/*" style="display: none;" onchange="previewCommentMedia('{{ pub.id }}', 'video')">
+                            
+                            <div class="comment-actions">
+                                <div class="comment-media-btns">
+                                    <button type="button" class="comment-media-btn" onclick="document.getElementById('comment-img-input-{{ pub.id }}').click()" title="{% trans 'Agregar imagen' %}">
+                                        <i class="bi bi-image"></i>
+                                    </button>
+                                    <button type="button" class="comment-media-btn" onclick="document.getElementById('comment-video-input-{{ pub.id }}').click()" title="{% trans 'Agregar video' %}">
+                                        <i class="bi bi-camera-video"></i>
+                                    </button>
+                                </div>
+                                <button type="submit" class="comment-submit" disabled>
+                                    {% trans "Comentar" %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Lista de comentarios -->
+                    <div class="comments-list" id="comments-list-{{ pub.id }}"></div>
+                    
+                    <!-- Botón Ver más comentarios -->
+                    <div class="load-more-comments" id="load-more-{{ pub.id }}" style="display: none;">
+                        <button type="button" class="load-more-btn" onclick="loadMoreComments('{{ pub.id }}')">
+                            {% trans "Ver más comentarios" %}
+                        </button>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state-feed" style="border-radius: 8px; padding: 3rem;">
+                <i class="bi bi-file-post"></i>
+                <h3>{% trans "No hay publicaciones aún" %}</h3>
+                <p>{% trans "Sé el primero en compartir algo" %}</p>
+            </div>
+            {% endfor %}
+            
+        </main>
+        
+        <!-- ========== SIDEBAR DERECHO ========== -->
+        <aside class="right-sidebar">
+            <div class="suggestions-card">
+                <h3 class="suggestions-title">{% trans "Personas que quizás conozcas" %}</h3>
+                <div class="empty-state">
+                    <i class="bi bi-people" style="font-size: 48px; color: #d1d5db;"></i>
+                    <p style="font-size: 14px; color: #9ca3af; margin-top: 0.5rem;">{% trans "No hay sugerencias" %}</p>
+                </div>
+            </div>
+        </aside>
+        
+    </div>
+</div>
+
+<!-- ===== MODAL BOOTSTRAP CREAR PUBLICACIÓN ===== -->
+<div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="createPostForm" method="post" action="{% url 'crear_publicacion' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" id="createPostModalLabel">{% trans "Crear publicación" %}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-2">
+                            <img src="{{ user.get_avatar_url }}" alt="Avatar" class="avatar-md">
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ user.get_full_name }}</h6>
+                            <small class="text-muted">
+                                <i class="bi bi-globe"></i> {% trans "Cualquiera" %}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <textarea 
+                        name="contenido" 
+                        id="postContent"
+                        class="form-control border-0 px-0" 
+                        rows="4" 
+                        placeholder="{% trans '¿Sobre qué quieres hablar?' %}" 
+                        style="box-shadow: none; resize: none; font-size: 1.1rem;"></textarea>
+                    
+                    <div id="mediaPreviewContainer" class="position-relative mt-3" style="display: none;">
+                        <button type="button" class="btn btn-dark btn-sm position-absolute top-0 end-0 m-2 rounded-circle" onclick="removeMedia()" style="z-index: 10;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <img id="previewImage" class="img-fluid rounded border" style="display: none; width: 100%;">
+                        <video id="previewVideo" controls class="w-100 rounded border" style="display: none;"></video>
+                    </div>
+
+                    <input type="file" name="imagen" id="imageInput" accept="image/*" style="display: none;" onchange="previewMedia(this, 'image')">
+                    <input type="file" name="video" id="videoInput" accept="video/*" style="display: none;" onchange="previewMedia(this, 'video')">
+                </div>
+                
+                <div class="modal-footer justify-content-between border-top-0" style="border-top: 1px solid var(--border-color) !important; background-color: var(--bg-card);">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn rounded-circle p-2" style="background-color: var(--bg-body); color: var(--text-secondary);" onclick="document.getElementById('imageInput').click()" title="{% trans 'Añadir foto' %}">
+                            <i class="bi bi-image fs-5 text-success"></i>
+                        </button>
+                        <button type="button" class="btn rounded-circle p-2" style="background-color: var(--bg-body); color: var(--text-secondary);" onclick="document.getElementById('videoInput').click()" title="{% trans 'Añadir video' %}">
+                            <i class="bi bi-camera-video fs-5 text-danger"></i>
+                        </button>
+                    </div>
+                    <button type="submit" id="submitPost" class="btn btn-primary rounded-pill px-4 fw-bold" disabled>
+                        {% trans "Publicar" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL RESPONDER COMENTARIO ===== -->
+<div class="reply-modal" id="replyModal">
+    <div class="reply-dialog">
+        <div class="reply-header">
+            <h3 class="reply-title">{% trans "Responder comentario" %}</h3>
+            <button type="button" class="reply-close" onclick="closeReplyModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="reply-body">
+            <div class="reply-to-comment" id="replyToComment"></div>
+            
+            <form id="replyForm" enctype="multipart/form-data">
+                <textarea 
+                    id="replyContent" 
+                    class="comment-input w-100" 
+                    rows="3" 
+                    placeholder="{% trans 'Escribe tu respuesta...' %}"
+                    oninput="toggleReplySubmit()"
+                ></textarea>
+                
+                <div class="comment-media-preview" id="replyPreview" style="display: none;">
+                    <button type="button" class="remove-comment-media" onclick="removeReplyMedia()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                    <img id="replyImgPreview" style="display: none;">
+                    <video id="replyVideoPreview" controls style="display: none;"></video>
+                </div>
+                
+                <input type="file" id="replyImgInput" accept="image/*" style="display: none;" onchange="previewReplyMedia('image')">
+                <input type="file" id="replyVideoInput" accept="video/*" style="display: none;" onchange="previewReplyMedia('video')">
+                
+                <div class="comment-actions mt-3">
+                    <div class="comment-media-btns">
+                        <button type="button" class="comment-media-btn" onclick="document.getElementById('replyImgInput').click()">
+                            <i class="bi bi-image"></i>
+                        </button>
+                        <button type="button" class="comment-media-btn" onclick="document.getElementById('replyVideoInput').click()">
+                            <i class="bi bi-camera-video"></i>
+                        </button>
+                    </div>
+                    <button type="button" class="comment-submit" id="replySubmitBtn" onclick="submitReply()" disabled>
+                        {% trans "Responder" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ===== VARIABLES GLOBALES =====
+const csrftoken = '{{ csrf_token }}';
+let currentReplyData = {
+    publicacionId: null,
+    comentarioPadreId: null
+};
+let commentsOffset = {};
+
+// ===== VALIDACIÓN FORMULARIO PUBLICACIÓN =====
+const postContent = document.getElementById('postContent');
+const submitPost = document.getElementById('submitPost');
+const imageInput = document.getElementById('imageInput');
+const videoInput = document.getElementById('videoInput');
+
+function validatePostForm() {
+    const hasText = postContent.value.trim().length > 0;
+    const hasImage = imageInput.files.length > 0;
+    const hasVideo = videoInput.files.length > 0;
+    submitPost.disabled = !(hasText || hasImage || hasVideo);
+}
+
+postContent.addEventListener('input', validatePostForm);
+
+// ===== PREVISUALIZACIÓN DE MEDIA (PUBLICACIÓN) =====
+function previewMedia(input, type) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const container = document.getElementById('mediaPreviewContainer');
+    const img = document.getElementById('previewImage');
+    const video = document.getElementById('previewVideo');
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        container.style.display = 'block';
+        if (type === 'image') {
+            img.src = e.target.result;
+            img.style.display = 'block';
+            video.style.display = 'none';
+            videoInput.value = '';
+        } else {
+            video.src = e.target.result;
+            video.style.display = 'block';
+            img.style.display = 'none';
+            imageInput.value = '';
+        }
+        validatePostForm();
+    }
+    reader.readAsDataURL(file);
+}
+
+function removeMedia() {
+    document.getElementById('mediaPreviewContainer').style.display = 'none';
+    imageInput.value = '';
+    videoInput.value = '';
+    document.getElementById('previewImage').src = '';
+    document.getElementById('previewVideo').src = '';
+    validatePostForm();
+}
+
+// ===== RESET MODAL AL CERRAR =====
+const createPostModal = document.getElementById('createPostModal');
+createPostModal.addEventListener('hidden.bs.modal', function () {
+    document.getElementById('createPostForm').reset();
+    removeMedia();
+});
+
+// ===== PREVISUALIZACIÓN MEDIA COMENTARIOS =====
+function previewCommentMedia(pubId, type) {
+    const input = document.getElementById(`comment-${type}-input-${pubId}`);
+    const file = input.files[0];
+    if (!file) return;
+
+    const preview = document.getElementById(`comment-preview-${pubId}`);
+    const img = document.getElementById(`comment-img-${pubId}`);
+    const video = document.getElementById(`comment-video-${pubId}`);
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        preview.style.display = 'block';
+        if (type === 'image') {
+            img.src = e.target.result;
+            img.style.display = 'block';
+            video.style.display = 'none';
+            document.getElementById(`comment-video-input-${pubId}`).value = '';
+        } else {
+            video.src = e.target.result;
+            video.style.display = 'block';
+            img.style.display = 'none';
+            document.getElementById(`comment-img-input-${pubId}`).value = '';
+        }
+    }
+    reader.readAsDataURL(file);
+}
+
+function removeCommentMedia(pubId) {
+    const preview = document.getElementById(`comment-preview-${pubId}`);
+    preview.style.display = 'none';
+    document.getElementById(`comment-img-input-${pubId}`).value = '';
+    document.getElementById(`comment-video-input-${pubId}`).value = '';
+}
+
+function toggleCommentSubmit(textarea) {
+    const form = textarea.closest('form');
+    const btn = form.querySelector('.comment-submit');
+    btn.disabled = textarea.value.trim().length === 0;
+}
+
+// ===== LIKES =====
+function toggleLike(publicacionId, button) {
+    fetch(`/feed/post/${publicacionId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const icon = button.querySelector('i');
+            if (data.liked) {
+                button.classList.add('liked');
+                icon.className = 'bi bi-hand-thumbs-up-fill';
+            } else {
+                button.classList.remove('liked');
+                icon.className = 'bi bi-hand-thumbs-up';
+            }
+            
+            const likesSpan = document.querySelector(`[data-likes="${publicacionId}"]`);
+            if (likesSpan) {
+                likesSpan.textContent = data.total_likes;
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// ===== SEGUIR/DEJAR DE SEGUIR =====
+function toggleFollow(usuarioId, button) {
+    fetch(`/feed/user/${usuarioId}/follow/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const text = button.querySelector('.follow-text');
+            if (data.siguiendo) {
+                button.classList.add('following');
+                text.textContent = '{% trans "Siguiendo" %}';
+            } else {
+                button.classList.remove('following');
+                text.textContent = '{% trans "Seguir" %}';
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// ===== COMENTARIOS =====
+function toggleComments(publicacionId) {
+    const section = document.getElementById(`comments-${publicacionId}`);
+    const isActive = section.classList.contains('active');
+    
+    if (!isActive) {
+        section.classList.add('active');
+        if (!commentsOffset[publicacionId]) {
+            commentsOffset[publicacionId] = 0;
+            loadComments(publicacionId);
+        }
+    } else {
+        section.classList.remove('active');
+    }
+}
+
+function loadComments(publicacionId, loadMore = false) {
+    if (!loadMore) {
+        commentsOffset[publicacionId] = 0;
+    }
+    
+    const list = document.getElementById(`comments-list-${publicacionId}`);
+    const limit = 3;
+    const offset = commentsOffset[publicacionId];
+    
+    fetch(`/feed/post/${publicacionId}/comments/?limit=${limit}&offset=${offset}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (!loadMore) {
+                    list.innerHTML = '';
+                }
+                
+                renderComments(data.comentarios, list);
+                
+                const loadMoreBtn = document.getElementById(`load-more-${publicacionId}`);
+                if (data.has_more) {
+                    loadMoreBtn.style.display = 'block';
+                    commentsOffset[publicacionId] = offset + limit;
+                } else {
+                    loadMoreBtn.style.display = 'none';
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function loadMoreComments(publicacionId) {
+    loadComments(publicacionId, true);
+}
+
+function renderComments(comentarios, container) {
+    comentarios.forEach(comentario => {
+        const div = document.createElement('div');
+        div.className = `comment level-${comentario.nivel}`;
+        
+        let mediaHtml = '';
+        if (comentario.imagen) {
+            mediaHtml = `<img src="${comentario.imagen}" class="comment-media-img">`;
+        } else if (comentario.video) {
+            mediaHtml = `<video src="${comentario.video}" controls class="comment-media-img"></video>`;
+        }
+        
+        div.innerHTML = `
+            <img src="${comentario.autor_avatar}" alt="Avatar" class="avatar-sm">
+            <div class="comment-body">
+                <div class="comment-author">${comentario.autor}</div>
+                <div class="comment-text">${comentario.contenido}</div>
+                ${mediaHtml}
+                <div class="comment-meta">
+                    <span>${comentario.fecha}</span>
+                    ${comentario.nivel < 3 ? `<span class="comment-action" onclick="openReplyModal(${comentario.id}, '${comentario.autor}', '${comentario.contenido}')">{% trans "Responder" %}</span>` : ''}
+                    ${comentario.total_respuestas > 0 ? `<span>${comentario.total_respuestas} respuesta${comentario.total_respuestas > 1 ? 's' : ''}</span>` : ''}
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+        
+        if (comentario.respuestas && comentario.respuestas.length > 0) {
+            renderComments(comentario.respuestas, container);
+        }
+    });
+}
+
+function submitComment(event, publicacionId) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    fetch(`/feed/post/${publicacionId}/comment/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadComments(publicacionId);
+            
+            const counter = document.querySelector(`[data-comments="${publicacionId}"]`);
+            if (counter) {
+                counter.textContent = data.total_comentarios;
+            }
+            
+            form.reset();
+            form.querySelector('.comment-input').style.height = 'auto';
+            form.querySelector('.comment-submit').disabled = true;
+            removeCommentMedia(publicacionId);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// ===== MODAL RESPONDER =====
+function openReplyModal(comentarioId, autorNombre, contenido) {
+    const publicacionId = document.querySelector(`[data-post-id]`).dataset.postId;
+    currentReplyData = {
+        publicacionId: publicacionId,
+        comentarioPadreId: comentarioId
+    };
+    
+    document.getElementById('replyToComment').innerHTML = `
+        <div class="reply-to-author">{% trans "Respondiendo a" %} ${autorNombre}</div>
+        <div class="reply-to-text">${contenido.substring(0, 100)}${contenido.length > 100 ? '...' : ''}</div>
+    `;
+    
+    document.getElementById('replyModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReplyModal() {
+    document.getElementById('replyModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    document.getElementById('replyForm').reset();
+    removeReplyMedia();
+}
+
+function previewReplyMedia(type) {
+    const input = document.getElementById(type === 'image' ? 'replyImgInput' : 'replyVideoInput');
+    const file = input.files[0];
+    if (!file) return;
+
+    const preview = document.getElementById('replyPreview');
+    const img = document.getElementById('replyImgPreview');
+    const video = document.getElementById('replyVideoPreview');
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        preview.style.display = 'block';
+        if (type === 'image') {
+            img.src = e.target.result;
+            img.style.display = 'block';
+            video.style.display = 'none';
+            document.getElementById('replyVideoInput').value = '';
+        } else {
+            video.src = e.target.result;
+            video.style.display = 'block';
+            img.style.display = 'none';
+            document.getElementById('replyImgInput').value = '';
+        }
+    }
+    reader.readAsDataURL(file);
+}
+
+function removeReplyMedia() {
+    document.getElementById('replyPreview').style.display = 'none';
+    document.getElementById('replyImgInput').value = '';
+    document.getElementById('replyVideoInput').value = '';
+}
+
+function toggleReplySubmit() {
+    const content = document.getElementById('replyContent').value.trim();
+    const hasImage = document.getElementById('replyImgInput').files.length > 0;
+    const hasVideo = document.getElementById('replyVideoInput').files.length > 0;
+    document.getElementById('replySubmitBtn').disabled = !(content.length > 0 || hasImage || hasVideo);
+}
+
+function submitReply() {
+    const formData = new FormData();
+    formData.append('contenido', document.getElementById('replyContent').value);
+    formData.append('comentario_padre_id', currentReplyData.comentarioPadreId);
+    
+    const imgFile = document.getElementById('replyImgInput').files[0];
+    const videoFile = document.getElementById('replyVideoInput').files[0];
+    
+    if (imgFile) formData.append('imagen', imgFile);
+    if (videoFile) formData.append('video', videoFile);
+    
+    fetch(`/feed/post/${currentReplyData.publicacionId}/comment/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeReplyModal();
+            loadComments(currentReplyData.publicacionId);
+            
+            const counter = document.querySelector(`[data-comments="${currentReplyData.publicacionId}"]`);
+            if (counter) {
+                counter.textContent = data.total_comentarios;
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}

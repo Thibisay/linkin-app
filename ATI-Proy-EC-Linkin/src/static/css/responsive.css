@@ -1,0 +1,59 @@
+/* ============================================
+   LINKING X - RESPONSIVE LAYOUT
+   ============================================ */
+
+/* Desktop Grid Layout (3 Columns) */
+@media (min-width: 1024px) {
+  .main-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr 300px;
+    gap: var(--space-6);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .sidebar-left {
+    position: sticky;
+    top: 72px;
+    height: fit-content;
+  }
+  
+  .main-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .sidebar-right {
+    position: sticky;
+    top: 72px;
+    height: fit-content;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  main {
+    padding-bottom: calc(var(--nav-height) + var(--space-4));
+  }
+  
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Desktop Only */
+@media (min-width: 768px) {
+  .show-mobile {
+    display: none !important;
+  }
+}

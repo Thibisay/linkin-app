@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Empleos guardados" %} - Linking X{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/jobs.css' %}">
+<style>
+    .saved-jobs-header {
+        margin-bottom: 2rem;
+    }
+
+    .saved-job-card {
+        background: var(--bg-card, white);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        color: var(--text-primary, #111827);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .saved-date {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 12px;
+        color: var(--text-secondary, #9ca3af);
+    }
+
+    .remove-saved-btn {
+        position: absolute;
+        top: 1rem;
+        right: 3rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: #dc2626;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .remove-saved-btn:hover {
+        background: #fee2e2;
+    }
+
+    /* Clases de datos del empleo guardado */
+    .job-company-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .job-card-header {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .job-card-info { flex: 1; }
+
+    .job-card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary, #111827);
+        margin-bottom: 0.25rem;
+    }
+
+    .job-card-company {
+        font-size: 14px;
+        color: var(--text-secondary, #6b7280);
+        margin-bottom: 0.5rem;
+    }
+
+    .job-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 13px;
+        color: var(--text-secondary, #6b7280);
+    }
+
+    .job-card-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Notas */
+    .saved-notes {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: var(--bg-body, #f9fafb);
+        border-radius: 6px;
+        border: 1px solid var(--border-color, #e5e7eb);
+        font-size: 14px;
+        color: var(--text-primary, #374151);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="jobs-container">
+    <div class="saved-jobs-header">
+        <h1 class="h3">
+            <i class="bi bi-bookmark-fill text-primary me-2"></i>
+            {% trans "Empleos guardados" %}
+        </h1>
+        <p class="text-muted">{{ total_guardados }} {% trans "empleos guardados" %}</p>
+    </div>
+    
+    {% for empleo_guardado in empleos_guardados %}
+    <div class="saved-job-card">
+        <span class="saved-date">
+            <i class="bi bi-bookmark-fill"></i> {% trans "Guardado" %} {{ empleo_guardado.fecha_guardado|timesince }} {% trans "atrás" %}
+        </span>
+        <button class="remove-saved-btn" onclick="removerGuardado('{{ empleo_guardado.oferta.id }}')" title="{% trans 'Remover de guardados' %}">
+            <i class="bi bi-trash"></i>
+        </button>
+        
+        <a href="{% url 'job_detail' empleo_guardado.oferta.id %}" style="text-decoration: none; color: inherit; display: block;">
+            <div class="job-card-header">
+                <img src="{{ empleo_guardado.oferta.empresa.user.get_avatar_url }}" alt="Logo" class="job-company-logo">
+                <div class="job-card-info">
+                    <h3 class="job-card-title">{{ empleo_guardado.oferta.titulo }}</h3>
+                    <div class="job-card-company">{{ empleo_guardado.oferta.empresa.nombre_empresa }}</div>
+                    <div class="job-card-meta">
+                        <span class="job-card-meta-item">
+                            <i class="bi bi-geo-alt"></i> {{ empleo_guardado.oferta.ubicacion }}
+                        </span>
+                        <span class="job-card-meta-item">
+                            <i class="bi bi-briefcase"></i> {{ empleo_guardado.oferta.get_tipo_empleo_display }}
+                        </span>
+                        <span class="job-card-meta-item">
+                            <i class="bi bi-laptop"></i> {{ empleo_guardado.oferta.get_modalidad_display }}
+                        </span>
+                    </div>
+                    <div class="job-card-tags" style="margin-top: 0.75rem;">
+                        <span class="job-tag highlighted">{{ empleo_guardado.oferta.get_nivel_display }}</span>
+                        {% if empleo_guardado.oferta.salario_min and empleo_guardado.oferta.mostrar_salario %}
+                        <span class="job-tag">${{ empleo_guardado.oferta.salario_min|floatformat:0 }} - ${{ empleo_guardado.oferta.salario_max|floatformat:0 }}</span>
+                        {% endif %}
+                        {% if empleo_guardado.oferta.id in empleos_aplicados %}
+                        <span class="job-tag" style="background: #d1fae5; color: #065f46;">
+                            <i class="bi bi-check-circle"></i> {% trans "Ya aplicaste" %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </a>
+        
+        {% if empleo_guardado.notas %}
+        <div class="saved-notes">
+            <strong class="small">{% trans "Notas:" %}</strong>
+            <p class="small mb-0">{{ empleo_guardado.notas }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div class="empty-state text-center py-5">
+        <i class="bi bi-bookmark" style="font-size: 64px; color: #9ca3af;"></i>
+        <h3 class="mt-3">{% trans "No tienes empleos guardados" %}</h3>
+        <p class="text-muted">{% trans "Guarda empleos interesantes para revisarlos más tarde" %}</p>
+        <a href="{% url 'job_list' %}" class="btn btn-primary mt-3">
+            <i class="bi bi-search me-2"></i>{% trans "Buscar empleos" %}
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = '{{ csrf_token }}';
+
+function removerGuardado(jobId) {
+    if (!confirm('{% trans "¿Remover este empleo de guardados?" %}')) {
+        return;
+    }
+    
+    fetch(`/jobs/${jobId}/save/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.message || '{% trans "Error al remover empleo" %}');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{% trans "Error al remover empleo" %}');
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Mensajes" %} - Linking X{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messages.css' %}">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.add('page-message-list');
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="messenger-container">
+    <div class="messenger-layout" id="messengerLayout">
+        
+        <!-- CONVERSATIONS COLUMN -->
+        <div class="conversations-column">
+            <div class="conversations-header">
+                <div class="conversations-title-row">
+                    <h1 class="conversations-title">{% trans "Mensajes" %}</h1>
+                    <div class="header-actions">
+                        <button type="button" class="header-btn" onclick="openNewMessageModal()" title="{% trans 'Nuevo mensaje' %}">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button type="button" class="header-btn" onclick="toggleOptionsDropdown(event)" title="{% trans 'Opciones' %}">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="conversations-search">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="{% trans 'Buscar en Mensajes' %}" id="searchInput">
+                </div>
+            </div>
+            
+            <div class="conversations-list" id="conversationsList">
+                {% for conv_data in conversaciones_data %}
+                <a href="{% url 'message_detail' conv_data.conversacion.id %}" class="conversation-item">
+                    <div class="conversation-avatar">
+                        <img src="{{ conv_data.otro_usuario.get_avatar_url }}" alt="Avatar">
+                    </div>
+                    
+                    <div class="conversation-info">
+                        <div class="conversation-name">{{ conv_data.otro_usuario.get_full_name }}</div>
+                        <div class="conversation-preview {% if conv_data.no_leidos > 0 %}unread{% endif %}">
+                            {% if conv_data.ultimo_mensaje %}
+                                {{ conv_data.ultimo_mensaje.contenido|truncatewords:8 }}
+                            {% else %}
+                                {% trans "Inicia una conversación" %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-meta">
+                        {% if conv_data.ultimo_mensaje %}
+                        <span class="conversation-time">{{ conv_data.ultimo_mensaje.fecha_envio|timesince }}</span>
+                        {% endif %}
+                        {% if conv_data.no_leidos > 0 %}
+                        <span class="unread-badge">{{ conv_data.no_leidos }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="empty-chat">
+                    <i class="bi bi-chat-dots"></i>
+                    <h3>{% trans "No hay conversaciones" %}</h3>
+                    <p>{% trans "Inicia una nueva conversación" %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- CHAT COLUMN (hidden in mobile for message_list) -->
+        <div class="chat-column">
+            <div class="empty-chat">
+                <i class="bi bi-chat-left-text"></i>
+                <h3>{% trans "Selecciona un mensaje" %}</h3>
+                <p>{% trans "Elige una conversación para comenzar a chatear" %}</p>
+            </div>
+        </div>
+        
+        <!-- PROFILE COLUMN (hidden in mobile for message_list) -->
+        <div class="profile-column">
+            <div class="empty-chat">
+                <i class="bi bi-person-circle"></i>
+                <h3>{% trans "Información del contacto" %}</h3>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Modal Nuevo Mensaje -->
+<div class="new-message-modal" id="newMessageModal">
+    <div class="new-message-dialog">
+        <div class="new-message-header">
+            <h2 class="new-message-title">{% trans "Nuevo mensaje" %}</h2>
+            <button type="button" class="modal-close-btn" onclick="closeNewMessageModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="new-message-search">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="userSearchInput" placeholder="{% trans 'Buscar contacto...' %}" oninput="searchUsers()">
+            </div>
+        </div>
+        
+        <div class="users-list" id="usersList">
+            <div class="empty-search">
+                <i class="bi bi-people" style="font-size: 48px; margin-bottom: 1rem;"></i>
+                <p>{% trans "Busca un contacto para enviar un mensaje" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dropdown Opciones (3 puntos) -->
+<div class="dropdown-menu-custom" id="optionsDropdown">
+    <button class="dropdown-item" onclick="marcarTodosLeidos()">
+        <i class="bi bi-check2-all"></i>
+        <span>{% trans "Marcar todo como leído" %}</span>
+    </button>
+    <button class="dropdown-item" onclick="ordenarPorFecha()">
+        <i class="bi bi-sort-down"></i>
+        <span>{% trans "Ordenar por fecha" %}</span>
+    </button>
+    <div class="dropdown-divider"></div>
+    <button class="dropdown-item" onclick="configuracionMensajes()">
+        <i class="bi bi-gear"></i>
+        <span>{% trans "Configuración" %}</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const csrftoken = '{{ csrf_token }}';
+
+// ========== BÚSQUEDA DE CONVERSACIONES ==========
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const conversations = document.querySelectorAll('.conversation-item');
+    
+    conversations.forEach(conv => {
+        const name = conv.querySelector('.conversation-name').textContent.toLowerCase();
+        const preview = conv.querySelector('.conversation-preview').textContent.toLowerCase();
+        
+        if (name.includes(searchTerm) || preview.includes(searchTerm)) {
+            conv.style.display = 'flex';
+        } else {
+            conv.style.display = 'none';
+        }
+    });
+});
+
+// ========== MODAL NUEVO MENSAJE ==========
+function openNewMessageModal() {
+    document.getElementById('newMessageModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('userSearchInput').focus();
+}
+
+function closeNewMessageModal() {
+    document.getElementById('newMessageModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    document.getElementById('userSearchInput').value = '';
+    document.getElementById('usersList').innerHTML = `
+        <div class="empty-search">
+            <i class="bi bi-people" style="font-size: 48px; margin-bottom: 1rem;"></i>
+            <p>{% trans "Busca un contacto para enviar un mensaje" %}</p>
+        </div>
+    `;
+}
+
+// Buscar usuarios
+let searchTimeout;
+function searchUsers() {
+    const query = document.getElementById('userSearchInput').value.trim();
+    
+    if (query.length < 2) {
+        document.getElementById('usersList').innerHTML = `
+            <div class="empty-search">
+                <i class="bi bi-people" style="font-size: 48px; margin-bottom: 1rem;"></i>
+                <p>{% trans "Busca un contacto para enviar un mensaje" %}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        fetch(`/api/search-users/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.users && data.users.length > 0) {
+                    let html = '';
+                    data.users.forEach(user => {
+                        html += `
+                            <a href="/messages/create/${user.id}/" class="user-item">
+                                <img src="${user.avatar}" alt="Avatar" class="user-avatar">
+                                <div class="user-info">
+                                    <div class="user-name">${user.name}</div>
+                                    <div class="user-title">${user.title || ''}</div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    document.getElementById('usersList').innerHTML = html;
+                } else {
+                    document.getElementById('usersList').innerHTML = `
+                        <div class="empty-search">
+                            <i class="bi bi-search" style="font-size: 48px; margin-bottom: 1rem;"></i>
+                            <p>{% trans "No se encontraron usuarios" %}</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error searching users:', error);
+            });
+    }, 300);
+}
+
+// ========== DROPDOWN OPCIONES (3 PUNTOS) ==========
+function toggleOptionsDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('optionsDropdown');
+    const button = event.currentTarget;
+    const rect = button.getBoundingClientRect();
+    
+    // Toggle dropdown
+    dropdown.classList.toggle('active');
+    
+    if (dropdown.classList.contains('active')) {
+        // Posicionar dropdown debajo del botón
+        dropdown.style.top = (rect.bottom + 5) + 'px';
+        dropdown.style.left = (rect.left - 150) + 'px';
+        
+        // Cerrar si se hace click fuera
+        document.addEventListener('click', closeOptionsDropdownOutside);
+    } else {
+        document.removeEventListener('click', closeOptionsDropdownOutside);
+    }
+}
+
+function closeOptionsDropdown() {
+    const dropdown = document.getElementById('optionsDropdown');
+    dropdown.classList.remove('active');
+    document.removeEventListener('click', closeOptionsDropdownOutside);
+}
+
+function closeOptionsDropdownOutside(event) {
+    const dropdown = document.getElementById('optionsDropdown');
+    if (!dropdown.contains(event.target)) {
+        closeOptionsDropdown();
+    }
+}
+
+// ========== FUNCIONES DE OPCIONES ==========
+function marcarTodosLeidos() {
+    fetch('/api/messages/mark-all-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.querySelectorAll('.unread-badge').forEach(badge => badge.remove());
+            closeOptionsDropdown();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function ordenarPorFecha() {
+    window.location.href = window.location.pathname + '?sort=date';
+    closeOptionsDropdown();
+}
+
+function configuracionMensajes() {
+    window.location.href = '/messages/';
+    closeOptionsDropdown();
+}
+
+// Cerrar modales con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (document.getElementById('newMessageModal').classList.contains('active')) {
+            closeNewMessageModal();
+        }
+        if (document.getElementById('optionsDropdown').classList.contains('active')) {
+            closeOptionsDropdown();
+        }
+    }
+});
+</script>
+{% endblock %}
