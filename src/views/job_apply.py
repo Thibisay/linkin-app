@@ -11,6 +11,10 @@ def job_apply(request, job_id):
     Aplicar a una oferta de empleo
     """
     if request.user.tipo_usuario != 'profesional':
+        # Si es una petición AJAX (fetch), devolvemos JSON
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.method == 'POST':
+            return JsonResponse({'success': False, 'error': _('Solo profesionales pueden aplicar')})
+        
         messages.error(request, _('Solo profesionales pueden aplicar a ofertas'))
         return redirect('job_list')
     
@@ -21,6 +25,9 @@ def job_apply(request, job_id):
         profesional=request.user.profesional,
         oferta=oferta
     ).exists():
+        if request.method == 'POST':
+            return JsonResponse({'success': False, 'error': _('Ya has aplicado a esta oferta')})
+            
         messages.warning(request, _('Ya has aplicado a esta oferta'))
         return redirect('job_detail', job_id=job_id)
     
@@ -39,12 +46,12 @@ def job_apply(request, job_id):
                 estado='pendiente'
             )
             
-            messages.success(request, _('¡Aplicación enviada exitosamente!'))
-            return redirect('job_detail', job_id=job_id)
+            # ¡AQUÍ ESTÁ LA MAGIA! Respondemos con JSON en lugar de redirect
+            return JsonResponse({'success': True})
         
         except Exception as e:
-            messages.error(request, _('Hubo un error al enviar tu aplicación'))
-            return redirect('job_detail', job_id=job_id)
+            # Si hay un error, lo enviamos en el JSON para que JS lo muestre
+            return JsonResponse({'success': False, 'error': str(e)})
     
     return redirect('job_detail', job_id=job_id)
 

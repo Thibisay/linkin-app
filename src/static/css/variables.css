@@ -52,7 +52,7 @@
   /* =========================================
      PALETA DINÁMICA (MODO CLARO POR DEFECTO)
      ========================================= */
-  --bg-body: var(--lx-gray-50);
+  --bg-body: var(--lx-gray-600);
   --bg-card: #ffffff;
   --bg-header: #ffffff;
   --text-primary: var(--lx-gray-900);

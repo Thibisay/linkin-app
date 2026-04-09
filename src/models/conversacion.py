@@ -83,11 +83,17 @@ class Conversacion(models.Model):
         """Verifica si la conversación está bloqueada por el usuario"""
         return self.estado == 'bloqueada' and self.bloqueado_por == usuario
     
-    def puede_enviar_mensaje(self, usuario):
-        """Verifica si el usuario puede enviar mensajes"""
-        if self.estado == 'bloqueada':
+    def puede_enviar_mensaje(self, user):
+        # Si está bloqueada o rechazada, NADIE puede enviar mensajes
+        if self.estado in ['bloqueada', 'rechazada']:
             return False
+            
+        # Si está pendiente, SOLO el creador (participante_1) puede seguir enviando
+        if self.estado == 'pendiente':
+            return user == self.participante_1
+            
+        # Si está aceptada, AMBOS pueden enviar
         if self.estado == 'aceptada':
-            return True
-        # Si está pendiente, solo el iniciador puede enviar el primer mensaje
-        return self.participante_1 == usuario
+            return user in [self.participante_1, self.participante_2]
+            
+        return False

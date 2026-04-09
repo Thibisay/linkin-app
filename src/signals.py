@@ -125,7 +125,7 @@ def notificar_nuevo_mensaje(sender, instance, created, **kwargs):
         
         titulo = _("Nuevo mensaje")
         mensaje = _(f"{emisor.get_full_name()}: {instance.contenido[:50]}...")
-        url = reverse('message_detail', kwargs={'conversacion_id': instance.conversacion.id})
+        url = reverse('message_detail', kwargs={'conversation_id': instance.conversacion.id})
         
         crear_notificacion(
             destinatario=receptor,

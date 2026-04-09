@@ -76,54 +76,67 @@ def message_detail(request, conversation_id):
 @login_required
 def send_message(request, conversation_id):
     """
-    Enviar un mensaje
+    Enviar un mensaje (Versión de Diagnóstico)
     """
     if request.method != 'POST':
-        return JsonResponse({'error': 'Invalid method'}, status=405)
+        return JsonResponse({'success': False, 'error': 'Método inválido'})
     
-    conversacion = get_object_or_404(
-        Conversacion,
-        Q(participante_1=request.user) | Q(participante_2=request.user),
-        id=conversation_id
-    )
-    
-    # Verificar si puede enviar mensajes
-    if not conversacion.puede_enviar_mensaje(request.user):
+    try:
+        conversacion = get_object_or_404(
+            Conversacion,
+            Q(participante_1=request.user) | Q(participante_2=request.user),
+            id=conversation_id
+        )
+        
+        # Verificar si puede enviar mensajes
+        if not conversacion.puede_enviar_mensaje(request.user):
+            return JsonResponse({
+                'success': False,
+                'error': 'No puedes enviar mensajes en esta conversación'
+            })
+        
+        contenido = request.POST.get('contenido', '').strip()
+        
+        if not contenido:
+            return JsonResponse({'success': False, 'error': 'El mensaje está vacío'})
+        
+        otro_usuario = conversacion.get_otro_participante(request.user)
+        
+        mensaje = Mensaje.objects.create(
+            conversacion=conversacion,
+            emisor=request.user,
+            receptor=otro_usuario,
+            contenido=contenido,
+            archivo=request.FILES.get('archivo')
+        )
+        
+        # Refrescar y guardar
+        mensaje.refresh_from_db()
+        conversacion.save()
+        
+        # Validación segura de la fecha
+        fecha_formateada = mensaje.fecha_envio.strftime('%H:%M') if hasattr(mensaje, 'fecha_envio') and mensaje.fecha_envio else ''
+        
         return JsonResponse({
-            'success': False,
-            'error': _('No puedes enviar mensajes en esta conversación')
-        }, status=403)
-    
-    contenido = request.POST.get('contenido', '').strip()
-    
-    if not contenido:
-        return JsonResponse({'success': False, 'error': 'Empty message'}, status=400)
-    
-    otro_usuario = conversacion.get_otro_participante(request.user)
-    
-    mensaje = Mensaje.objects.create(
-        conversacion=conversacion,
-        emisor=request.user,
-        receptor=otro_usuario,
-        contenido=contenido,
-        archivo=request.FILES.get('archivo')
-    )
-    
-    # Actualizar conversación
-    conversacion.save()
-    
-    return JsonResponse({
-        'success': True,
-        'mensaje': {
-            'id': mensaje.id,
-            'contenido': mensaje.contenido,
-            'emisor_id': mensaje.emisor.id,
-            'emisor_nombre': mensaje.emisor.get_full_name(),
-            'emisor_avatar': mensaje.emisor.get_avatar_url(),
-            'fecha': mensaje.fecha_envio.strftime('%H:%M'),
-        }
-    })
-
+            'success': True,
+            'mensaje': {
+                'id': mensaje.id,
+                'contenido': mensaje.contenido,
+                'emisor_id': mensaje.emisor.id,
+                'emisor_nombre': mensaje.emisor.get_full_name(),
+                'fecha': fecha_formateada,
+            }
+        })
+        
+    except Exception as e:
+        # ¡AQUÍ ATRAPAMOS EL ERROR REAL!
+        import traceback
+        print("=== ERROR DETALLADO ===")
+        print(traceback.format_exc())
+        return JsonResponse({
+            'success': False, 
+            'error': f"Error en Python: {str(e)}"
+        })
 
 @login_required
 def accept_conversation(request, conversation_id):

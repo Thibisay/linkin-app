@@ -141,110 +141,107 @@
     </div>
 </div>
 
-<!-- Modal Crear Oferta -->
 <div class="modal fade" id="createJobModal" tabindex="-1" aria-labelledby="createJobModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-        <div class="modal-content">
-            <form id="createJobForm" method="post" action="{% url 'create_job' %}">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h2 class="modal-title" id="createJobModalLabel">{% trans "Nueva Oferta de Empleo" %}</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <form id="createJobForm" method="post" action="{% url 'create_job' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h2 class="modal-title" id="createJobModalLabel">{% trans "Nueva Oferta de Empleo" %}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">{% trans "Título del puesto" %} *</label>
+                    <input type="text" name="titulo" id="jobTitle" class="form-control" required placeholder="Ej: Desarrollador Full Stack Senior">
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Título del puesto" %} *</label>
-                        <input type="text" name="titulo" id="jobTitle" class="form-control" required placeholder="Ej: Desarrollador Full Stack Senior">
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">{% trans "Nivel de experiencia" %} *</label>
-                                <select name="nivel" id="jobNivel" class="form-select" required>
-                                    <option value="">{% trans "Seleccionar" %}</option>
-                                    <option value="junior">{% trans "Junior" %}</option>
-                                    <option value="mid">{% trans "Mid-level" %}</option>
-                                    <option value="senior">{% trans "Senior" %}</option>
-                                    <option value="lead">{% trans "Lead" %}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">{% trans "Tipo de empleo" %} *</label>
-                                <select name="tipo_empleo" id="jobTipo" class="form-select" required>
-                                    <option value="">{% trans "Seleccionar" %}</option>
-                                    <option value="tiempo_completo">{% trans "Tiempo completo" %}</option>
-                                    <option value="medio_tiempo">{% trans "Medio tiempo" %}</option>
-                                    <option value="freelance">{% trans "Freelance" %}</option>
-                                    <option value="pasantia">{% trans "Pasantía" %}</option>
-                                    <option value="temporal">{% trans "Temporal" %}</option>
-                                </select>
-                            </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">{% trans "Nivel de experiencia" %} *</label>
+                            <select name="nivel" id="jobNivel" class="form-select" required>
+                                <option value="">{% trans "Seleccionar" %}</option>
+                                <option value="junior">{% trans "Junior" %}</option>
+                                <option value="mid">{% trans "Mid-level" %}</option>
+                                <option value="senior">{% trans "Senior" %}</option>
+                                <option value="lead">{% trans "Lead" %}</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">{% trans "Modalidad" %} *</label>
-                                <select name="modalidad" id="jobModalidad" class="form-select" required>
-                                    <option value="">{% trans "Seleccionar" %}</option>
-                                    <option value="presencial">{% trans "Presencial" %}</option>
-                                    <option value="remoto">{% trans "Remoto" %}</option>
-                                    <option value="hibrido">{% trans "Híbrido" %}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">{% trans "Ubicación" %} *</label>
-                                <input type="text" name="ubicacion" id="jobUbicacion" class="form-control" required placeholder="Caracas, Venezuela">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Descripción" %} *</label>
-                        <textarea name="descripcion" id="jobDescripcion" class="form-control" required placeholder="Describe el puesto..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Requisitos" %} *</label>
-                        <textarea name="requisitos" id="jobRequisitos" class="form-control" required placeholder="Lista los requisitos..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Responsabilidades" %}</label>
-                        <textarea name="responsabilidades" id="jobResponsabilidades" class="form-control" placeholder="Describe las responsabilidades..."></textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">{% trans "Salario mínimo (USD)" %}</label>
-                                <input type="number" name="salario_min" id="jobSalarioMin" class="form-control" step="0.01" placeholder="1000">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">{% trans "Salario máximo (USD)" %}</label>
-                                <input type="number" name="salario_max" id="jobSalarioMax" class="form-control" step="0.01" placeholder="3000">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-check">
-                            <input type="checkbox" name="mostrar_salario" class="form-check-input" id="mostrarSalario" checked>
-                            <label class="form-check-label" for="mostrarSalario">
-                                {% trans "Mostrar salario públicamente" %}
-                            </label>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">{% trans "Tipo de empleo" %} *</label>
+                            <select name="tipo_empleo" id="jobTipo" class="form-select" required>
+                                <option value="">{% trans "Seleccionar" %}</option>
+                                <option value="tiempo_completo">{% trans "Tiempo completo" %}</option>
+                                <option value="medio_tiempo">{% trans "Medio tiempo" %}</option>
+                                <option value="freelance">{% trans "Freelance" %}</option>
+                                <option value="pasantia">{% trans "Pasantía" %}</option>
+                                <option value="temporal">{% trans "Temporal" %}</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cancelar" %}</button>
-                    <button type="submit" class="btn btn-primary" id="submitJobBtn">
-                        <i class="bi bi-check-circle me-2"></i>{% trans "Crear oferta" %}
-                    </button>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">{% trans "Modalidad" %} *</label>
+                            <select name="modalidad" id="jobModalidad" class="form-select" required>
+                                <option value="">{% trans "Seleccionar" %}</option>
+                                <option value="presencial">{% trans "Presencial" %}</option>
+                                <option value="remoto">{% trans "Remoto" %}</option>
+                                <option value="hibrido">{% trans "Híbrido" %}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">{% trans "Ubicación" %} *</label>
+                            <input type="text" name="ubicacion" id="jobUbicacion" class="form-control" required placeholder="Caracas, Venezuela">
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "Descripción" %} *</label>
+                    <textarea name="descripcion" id="jobDescripcion" class="form-control" required placeholder="Describe el puesto..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "Requisitos" %} *</label>
+                    <textarea name="requisitos" id="jobRequisitos" class="form-control" required placeholder="Lista los requisitos..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "Responsabilidades" %}</label>
+                    <textarea name="responsabilidades" id="jobResponsabilidades" class="form-control" placeholder="Describe las responsabilidades..."></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">{% trans "Salario mínimo (USD)" %}</label>
+                            <input type="number" name="salario_min" id="jobSalarioMin" class="form-control" step="0.01" placeholder="1000">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">{% trans "Salario máximo (USD)" %}</label>
+                            <input type="number" name="salario_max" id="jobSalarioMax" class="form-control" step="0.01" placeholder="3000">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" name="mostrar_salario" class="form-check-input" id="mostrarSalario" checked>
+                        <label class="form-check-label" for="mostrarSalario">
+                            {% trans "Mostrar salario públicamente" %}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cancelar" %}</button>
+                <button type="submit" class="btn btn-primary" id="submitJobBtn">
+                    <i class="bi bi-check-circle me-2"></i>{% trans "Crear oferta" %}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

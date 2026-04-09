@@ -20,12 +20,13 @@
         font-size: 24px;
         font-weight: 700;
         margin-bottom: 0.5rem;
+        color: var(--text-primary);
     }
     
     .search-tabs {
         display: flex;
         gap: 1rem;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid var(--border-color);
         margin-bottom: 2rem;
     }
     
@@ -33,7 +34,7 @@
         padding: 0.75rem 1.5rem;
         border: none;
         background: transparent;
-        color: #6b7280;
+        color: var(--text-secondary);
         font-weight: 600;
         cursor: pointer;
         border-bottom: 2px solid transparent;
@@ -42,13 +43,13 @@
     }
     
     .search-tab.active {
-        color: #0A66C2;
-        border-bottom-color: #0A66C2;
+        color: var(--lx-primary);
+        border-bottom-color: var(--lx-primary);
     }
     
     .result-card {
-        background: white;
-        border: 1px solid #e5e7eb;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1rem;
@@ -56,7 +57,7 @@
     }
     
     .result-card:hover {
-        border-color: #0A66C2;
+        border-color: var(--lx-primary);
         box-shadow: 0 2px 8px rgba(10, 102, 194, 0.15);
     }
     
@@ -80,23 +81,24 @@
     .result-name {
         font-size: 18px;
         font-weight: 600;
-        color: #111827;
+        color: var(--text-primary);
         text-decoration: none;
     }
     
     .result-name:hover {
-        color: #0A66C2;
+        color: var(--lx-primary);
     }
     
     .result-title {
         font-size: 14px;
-        color: #6b7280;
+        color: var(--text-secondary);
         margin-top: 0.25rem;
     }
     
     /* Job cards */
     .job-result-card {
-        border: 1px solid #e5e7eb;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1rem;
@@ -108,7 +110,7 @@
     }
     
     .job-result-card:hover {
-        border-color: #0A66C2;
+        border-color: var(--lx-primary);
         box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15);
     }
     
@@ -122,7 +124,7 @@
         height: 56px;
         border-radius: 8px;
         object-fit: cover;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border-color);
     }
     
     .job-card-info {
@@ -132,13 +134,13 @@
     .job-card-title {
         font-size: 18px;
         font-weight: 600;
-        color: #111827;
+        color: var(--text-primary);
         margin-bottom: 0.25rem;
     }
     
     .job-card-company {
         font-size: 14px;
-        color: #6b7280;
+        color: var(--text-secondary);
         margin-bottom: 0.5rem;
     }
     
@@ -147,7 +149,7 @@
         flex-wrap: wrap;
         gap: 1rem;
         font-size: 13px;
-        color: #6b7280;
+        color: var(--text-secondary);
     }
     
     .job-card-meta-item {
@@ -158,23 +160,25 @@
     
     .job-tag {
         padding: 0.25rem 0.75rem;
-        background: #f3f4f6;
-        color: #374151;
+        background: var(--bg-body);
+        color: var(--text-primary);
         border-radius: 12px;
         font-size: 12px;
         font-weight: 500;
         margin-right: 0.5rem;
+        border: 1px solid var(--border-color);
     }
     
     .job-tag.highlighted {
-        background: #E7F3FF;
-        color: #0A66C2;
+        background: var(--lx-primary-light);
+        color: var(--lx-primary);
+        border: 1px solid transparent;
     }
     
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        color: #9ca3af;
+        color: var(--text-secondary);
     }
 </style>
 {% endblock %}
@@ -223,7 +227,6 @@
     </div>
     {% else %}
         
-        <!-- Usuarios -->
         {% if tab == 'all' or tab == 'users' %}
             {% for usuario in usuarios %}
             <div class="result-card">
@@ -261,7 +264,6 @@
             {% endfor %}
         {% endif %}
         
-        <!-- Publicaciones -->
         {% if tab == 'all' or tab == 'posts' %}
             {% for pub in publicaciones %}
             <div class="result-card">
@@ -276,10 +278,10 @@
                         </div>
                     </div>
                 </div>
-                <div style="font-size: 15px; line-height: 1.5; color: #374151;">
+                <div style="font-size: 15px; line-height: 1.5; color: var(--text-primary);">
                     {{ pub.contenido|truncatewords:50 }}
                 </div>
-                <div style="margin-top: 1rem; font-size: 13px; color: #9ca3af;">
+                <div style="margin-top: 1rem; font-size: 13px; color: var(--text-secondary);">
                     {{ pub.num_likes }} {% trans "likes" %} · {{ pub.num_comentarios }} {% trans "comentarios" %}
                 </div>
             </div>
@@ -293,7 +295,6 @@
             {% endfor %}
         {% endif %}
         
-        <!-- Trabajos -->
         {% if tab == 'all' or tab == 'jobs' %}
             {% for trabajo in trabajos %}
             <a href="{% url 'job_detail' trabajo.id %}" class="job-result-card">

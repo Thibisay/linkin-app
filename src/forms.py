@@ -108,77 +108,15 @@ class LoginForm(forms.Form):
 class ProfesionalRegistrationForm(UserCreationForm):
     """Formulario de registro para profesionales"""
     
-    # Campos de Usuario
-    first_name = forms.CharField(
-        label=_("Nombres"),
-        max_length=150,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': _('Juan Carlos')
-        })
-    )
-    
-    last_name = forms.CharField(
-        label=_("Apellidos"),
-        max_length=150,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': _('Pérez García')
-        })
-    )
-    
-    email = forms.EmailField(
-        label=_("Correo electrónico"),
-        widget=forms.EmailInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'ejemplo@gmail.com'
-        })
-    )
-    
-    # Campos de Profesional
-    cedula = forms.CharField(
-        label=_("Cédula de identidad"),
-        max_length=20,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': '12345678'
-        }),
-        help_text=_("Solo números, sin puntos ni guiones")
-    )
-    
-    fecha_nacimiento = forms.DateField(
-        label=_("Fecha de nacimiento"),
-        widget=forms.DateInput(attrs={
-            'class': 'form-input',
-            'type': 'date'
-        })
-    )
-    
-    genero = forms.ChoiceField(
-        label=_("Género"),
-        choices=Profesional.GENERO_CHOICES,
-        widget=forms.Select(attrs={
-            'class': 'form-input'
-        })
-    )
-    
-    # Override password fields
-    password1 = forms.CharField(
-        label=_("Contraseña"),
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-input',
-            'placeholder': '••••••••'
-        }),
-        help_text=_("Mínimo 8 caracteres")
-    )
-    
-    password2 = forms.CharField(
-        label=_("Confirmar contraseña"),
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-input',
-            'placeholder': '••••••••'
-        })
-    )
+    # ... (tus campos first_name, last_name, email, cedula, etc. se quedan igualito a como los tenías) ...
+    first_name = forms.CharField(label=_("Nombres"), max_length=150, widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': _('Juan Carlos')}))
+    last_name = forms.CharField(label=_("Apellidos"), max_length=150, widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': _('Pérez García')}))
+    email = forms.EmailField(label=_("Correo electrónico"), widget=forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'ejemplo@gmail.com'}))
+    cedula = forms.CharField(label=_("Cédula de identidad"), max_length=20, widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': '12345678'}), help_text=_("Solo números, sin puntos ni guiones"))
+    fecha_nacimiento = forms.DateField(label=_("Fecha de nacimiento"), widget=forms.DateInput(attrs={'class': 'form-input', 'type': 'date'}))
+    genero = forms.ChoiceField(label=_("Género"), choices=Profesional.GENERO_CHOICES, widget=forms.Select(attrs={'class': 'form-input'}))
+    password1 = forms.CharField(label=_("Contraseña"), widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'}), help_text=_("Mínimo 8 caracteres"))
+    password2 = forms.CharField(label=_("Confirmar contraseña"), widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'}))
     
     class Meta:
         model = Usuario
@@ -186,13 +124,21 @@ class ProfesionalRegistrationForm(UserCreationForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Remove auto-generated help texts
         self.fields['password1'].help_text = _("Mínimo 8 caracteres")
         self.fields['password2'].help_text = None
+
+    # ¡NUEVO! Validamos el correo antes de guardar
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if Usuario.objects.filter(email=email).exists() or Usuario.objects.filter(username=email).exists():
+            raise forms.ValidationError(_("Este correo electrónico ya está registrado. Intenta iniciar sesión."))
+        return email
     
     def save(self, commit=True):
         user = super().save(commit=False)
+        # Usamos el correo limpio como username
         user.username = self.cleaned_data['email']
+        user.email = self.cleaned_data['email']
         user.tipo_usuario = 'profesional'
         
         if commit:
@@ -211,58 +157,13 @@ class ProfesionalRegistrationForm(UserCreationForm):
 class EmpresaRegistrationForm(UserCreationForm):
     """Formulario de registro para empresas"""
     
-    email = forms.EmailField(
-        label=_("Correo electrónico corporativo"),
-        widget=forms.EmailInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'contacto@empresa.com'
-        })
-    )
-    
-    # Campos específicos de Empresa
-    nombre_empresa = forms.CharField(
-        label=_("Nombre de la empresa"),
-        max_length=200,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Tech Solutions CA'
-        })
-    )
-    
-    rif = forms.CharField(
-        label=_("RIF"),
-        max_length=20,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'J-123456789'
-        }),
-        help_text=_("Formato: J-XXXXXXXXX")
-    )
-    
-    tipo_empresa = forms.ChoiceField(
-        label=_("Tipo de empresa"),
-        choices=Empresa.TIPO_EMPRESA_CHOICES,
-        widget=forms.Select(attrs={
-            'class': 'form-input'
-        })
-    )
-    
-    password1 = forms.CharField(
-        label=_("Contraseña"),
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-input',
-            'placeholder': '••••••••'
-        }),
-        help_text=_("Mínimo 8 caracteres")
-    )
-    
-    password2 = forms.CharField(
-        label=_("Confirmar contraseña"),
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-input',
-            'placeholder': '••••••••'
-        })
-    )
+    # ... (tus campos email, nombre_empresa, rif, tipo_empresa, etc. se quedan igual) ...
+    email = forms.EmailField(label=_("Correo electrónico corporativo"), widget=forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'contacto@empresa.com'}))
+    nombre_empresa = forms.CharField(label=_("Nombre de la empresa"), max_length=200, widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Tech Solutions CA'}))
+    rif = forms.CharField(label=_("RIF"), max_length=20, widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'J-123456789'}), help_text=_("Formato: J-XXXXXXXXX"))
+    tipo_empresa = forms.ChoiceField(label=_("Tipo de empresa"), choices=Empresa.TIPO_EMPRESA_CHOICES, widget=forms.Select(attrs={'class': 'form-input'}))
+    password1 = forms.CharField(label=_("Contraseña"), widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'}), help_text=_("Mínimo 8 caracteres"))
+    password2 = forms.CharField(label=_("Confirmar contraseña"), widget=forms.PasswordInput(attrs={'class': 'form-input', 'placeholder': '••••••••'}))
     
     class Meta:
         model = Usuario
@@ -272,10 +173,18 @@ class EmpresaRegistrationForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.fields['password1'].help_text = _("Mínimo 8 caracteres")
         self.fields['password2'].help_text = None
+
+    # ¡NUEVO! Validamos el correo antes de guardar
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if Usuario.objects.filter(email=email).exists() or Usuario.objects.filter(username=email).exists():
+            raise forms.ValidationError(_("Este correo electrónico ya está registrado. Intenta iniciar sesión."))
+        return email
     
     def save(self, commit=True):
         user = super().save(commit=False)
         user.username = self.cleaned_data['email']
+        user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['nombre_empresa']
         user.tipo_usuario = 'empresa'
         
@@ -290,8 +199,6 @@ class EmpresaRegistrationForm(UserCreationForm):
             )
         
         return user
-
-
 # ========== PROFILE FORMS ==========
 
 class ProfesionalProfileForm(forms.ModelForm):

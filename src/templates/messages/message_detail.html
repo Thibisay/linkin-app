@@ -162,7 +162,7 @@
                 {% endfor %}
             </div>
             
-            {% if not es_bloqueada and conversacion.estado == 'aceptada' or conversacion.participante_1 == request.user %}
+            {% if conversacion.estado == 'aceptada' or conversacion.estado == 'pendiente' and conversacion.participante_1 == request.user %}
             <div class="chat-input-area">
                 <form id="messageForm" method="post" action="{% url 'send_message' conversacion.id %}">
                     {% csrf_token %}

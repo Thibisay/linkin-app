@@ -17,6 +17,7 @@
         max-width: 900px;
         margin: 2rem auto;
         padding: 0 1rem;
+
     }
     
     .form-card {
@@ -24,6 +25,8 @@
         border-radius: 12px;
         border: 1px solid #e5e7eb;
         padding: 2rem;
+        max-height: 70vh; /* Ocupa máximo el 80% del alto de la pantalla */
+        overflow-y: auto; /* Permite hacer scroll vertical si el contenido se pasa */
     }
     
     .form-header {
@@ -99,7 +102,7 @@
                 {% if action == 'edit' %}
                     {% trans "Editar Oferta de Empleo" %}
                 {% else %}
-                    {% trans "Nueva Oferta de Empleo" %}
+                    {% trans "Nueva Oferta de Empleo paralelepipedo" %}
                 {% endif %}
             </h1>
             <p class="form-subtitle">{% trans "Completa los campos para publicar tu oferta" %}</p>

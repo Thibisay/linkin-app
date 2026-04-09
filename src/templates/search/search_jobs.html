@@ -26,9 +26,9 @@
     }
     
     .filters-card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border-color);
         padding: 1.5rem;
         margin-bottom: 1rem;
     }
@@ -36,7 +36,7 @@
     .filters-title {
         font-size: 18px;
         font-weight: 600;
-        color: #111827;
+        color: var(--text-primary);
         margin-bottom: 1rem;
     }
     
@@ -48,37 +48,40 @@
         display: block;
         font-size: 14px;
         font-weight: 600;
-        color: #374151;
+        color: var(--text-primary);
         margin-bottom: 0.5rem;
     }
     
     .filter-input {
         width: 100%;
         padding: 0.75rem;
-        border: 1px solid #d1d5db;
+        border: 1px solid var(--border-color);
         border-radius: 6px;
         font-size: 14px;
+        background: var(--bg-body);
+        color: var(--text-primary);
     }
     
     .filter-input:focus {
         outline: none;
-        border-color: #0A66C2;
+        border-color: var(--lx-primary);
         box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
     }
     
     .filter-select {
         width: 100%;
         padding: 0.75rem;
-        border: 1px solid #d1d5db;
+        border: 1px solid var(--border-color);
         border-radius: 6px;
         font-size: 14px;
-        background: white;
+        background: var(--bg-body);
+        color: var(--text-primary);
     }
     
     .btn-apply-filters {
         width: 100%;
         padding: 0.75rem;
-        background: #0A66C2;
+        background: var(--lx-primary);
         color: white;
         border: none;
         border-radius: 6px;
@@ -88,26 +91,31 @@
     }
     
     .btn-apply-filters:hover {
-        background: #004182;
+        background: var(--lx-primary-hover);
     }
     
     .btn-clear-filters {
         width: 100%;
         padding: 0.75rem;
-        background: white;
-        color: #6b7280;
-        border: 1px solid #d1d5db;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
         border-radius: 6px;
         font-weight: 600;
         cursor: pointer;
         margin-top: 0.5rem;
     }
     
+    .btn-clear-filters:hover {
+        background: var(--bg-body);
+        color: var(--text-primary);
+    }
+    
     /* Results Area */
     .results-area {
-        background: white;
+        background: var(--bg-card);
         border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border-color);
         padding: 1.5rem;
     }
     
@@ -117,34 +125,37 @@
         align-items: center;
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border-color);
     }
     
     .results-count {
         font-size: 16px;
         font-weight: 600;
-        color: #111827;
+        color: var(--text-primary);
     }
     
     .sort-select {
         padding: 0.5rem 1rem;
-        border: 1px solid #d1d5db;
+        border: 1px solid var(--border-color);
         border-radius: 6px;
         font-size: 14px;
+        background: var(--bg-body);
+        color: var(--text-primary);
     }
     
     /* Job Card */
     .job-result-card {
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1rem;
         transition: all 0.2s;
         cursor: pointer;
+        background: var(--bg-card);
     }
     
     .job-result-card:hover {
-        border-color: #0A66C2;
+        border-color: var(--lx-primary);
         box-shadow: 0 4px 12px rgba(10, 102, 194, 0.15);
     }
     
@@ -159,7 +170,7 @@
         height: 56px;
         border-radius: 8px;
         object-fit: cover;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border-color);
     }
     
     .job-card-info {
@@ -169,17 +180,17 @@
     .job-card-title {
         font-size: 18px;
         font-weight: 600;
-        color: #111827;
+        color: var(--text-primary);
         margin-bottom: 0.25rem;
     }
     
     .job-card-title:hover {
-        color: #0A66C2;
+        color: var(--lx-primary);
     }
     
     .job-card-company {
         font-size: 14px;
-        color: #6b7280;
+        color: var(--text-secondary);
         margin-bottom: 0.5rem;
     }
     
@@ -188,7 +199,7 @@
         flex-wrap: wrap;
         gap: 1rem;
         font-size: 13px;
-        color: #6b7280;
+        color: var(--text-secondary);
     }
     
     .job-card-meta-item {
@@ -206,16 +217,22 @@
     
     .job-tag {
         padding: 0.25rem 0.75rem;
-        background: #f3f4f6;
-        color: #374151;
+        background: var(--bg-body);
+        color: var(--text-primary);
         border-radius: 12px;
         font-size: 12px;
         font-weight: 500;
+        border: 1px solid var(--border-color);
     }
     
     .job-tag.highlighted {
-        background: #E7F3FF;
-        color: #0A66C2;
+        background: var(--lx-primary-light);
+        color: var(--lx-primary);
+        border: 1px solid transparent;
+    }
+
+    html.dark-mode .job-tag.highlighted {
+        background: rgba(10, 102, 194, 0.15);
     }
     
     /* Pagination */
@@ -228,27 +245,27 @@
     
     .page-link {
         padding: 0.5rem 1rem;
-        border: 1px solid #d1d5db;
+        border: 1px solid var(--border-color);
         border-radius: 6px;
-        color: #374151;
+        color: var(--text-primary);
         text-decoration: none;
     }
     
     .page-link:hover {
-        background: #f3f4f6;
+        background: var(--bg-body);
     }
     
     .page-link.active {
-        background: #0A66C2;
+        background: var(--lx-primary);
         color: white;
-        border-color: #0A66C2;
+        border-color: var(--lx-primary);
     }
     
     /* Empty State */
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        color: #9ca3af;
+        color: var(--text-secondary);
     }
     
     /* Responsive */
@@ -268,14 +285,12 @@
 <div class="search-jobs-container">
     <div class="search-layout">
         
-        <!-- Filters Sidebar -->
         <aside class="filters-sidebar">
             <div class="filters-card">
                 <h2 class="filters-title">{% trans "Filtros" %}</h2>
                 
                 <form method="get" action="{% url 'search_jobs' %}">
                     
-                    <!-- Búsqueda por palabra clave -->
                     <div class="filter-group">
                         <label class="filter-label">{% trans "Palabra clave" %}</label>
                         <input 
@@ -287,7 +302,6 @@
                         >
                     </div>
                     
-                    <!-- Ubicación -->
                     <div class="filter-group">
                         <label class="filter-label">{% trans "Ubicación" %}</label>
                         <input 
@@ -299,7 +313,6 @@
                         >
                     </div>
                     
-                    <!-- Tipo de empleo -->
                     <div class="filter-group">
                         <label class="filter-label">{% trans "Tipo de empleo" %}</label>
                         <select name="tipo_empleo" class="filter-select">
@@ -312,7 +325,6 @@
                         </select>
                     </div>
                     
-                    <!-- Modalidad -->
                     <div class="filter-group">
                         <label class="filter-label">{% trans "Modalidad" %}</label>
                         <select name="modalidad" class="filter-select">
@@ -325,7 +337,6 @@
                         </select>
                     </div>
                     
-                    <!-- Nivel -->
                     <div class="filter-group">
                         <label class="filter-label">{% trans "Nivel" %}</label>
                         <select name="nivel" class="filter-select">
@@ -338,7 +349,6 @@
                         </select>
                     </div>
                     
-                    <!-- Salario mínimo -->
                     <div class="filter-group">
                         <label class="filter-label">{% trans "Salario mínimo" %}</label>
                         <input 
@@ -363,7 +373,6 @@
             </div>
         </aside>
         
-        <!-- Results Area -->
         <main class="results-area">
             
             <div class="results-header">
@@ -377,7 +386,6 @@
                 </select>
             </div>
             
-            <!-- Job Cards -->
             {% for oferta in ofertas %}
             <a href="{% url 'job_detail' oferta.id %}" class="job-result-card" style="text-decoration: none; color: inherit; display: block;">
                 <div class="job-card-header">
@@ -417,7 +425,6 @@
             </div>
             {% endfor %}
             
-            <!-- Pagination -->
             {% if ofertas.has_other_pages %}
             <div class="pagination">
                 {% if ofertas.has_previous %}

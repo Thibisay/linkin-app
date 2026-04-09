@@ -22,26 +22,28 @@
     .notifications-title {
         font-size: 24px;
         font-weight: 700;
+        color: var(--text-primary);
     }
     
     .mark-all-read-btn {
         padding: 0.5rem 1rem;
-        background: white;
-        color: #0A66C2;
-        border: 1px solid #0A66C2;
+        background: transparent;
+        color: var(--lx-primary);
+        border: 1px solid var(--lx-primary);
         border-radius: 6px;
         font-weight: 600;
         cursor: pointer;
+        transition: background-color 0.2s;
     }
     
     .mark-all-read-btn:hover {
-        background: #E7F3FF;
+        background: var(--lx-primary-light);
     }
     
     .notifications-filters {
         display: flex;
         gap: 1rem;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid var(--border-color);
         margin-bottom: 1.5rem;
     }
     
@@ -49,7 +51,7 @@
         padding: 0.75rem 1.5rem;
         border: none;
         background: transparent;
-        color: #6b7280;
+        color: var(--text-secondary);
         font-weight: 600;
         cursor: pointer;
         border-bottom: 2px solid transparent;
@@ -58,13 +60,13 @@
     }
     
     .filter-tab.active {
-        color: #0A66C2;
-        border-bottom-color: #0A66C2;
+        color: var(--lx-primary);
+        border-bottom-color: var(--lx-primary);
     }
     
     .notification-card {
-        background: white;
-        border: 1px solid #e5e7eb;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 1rem 1.5rem;
         margin-bottom: 1rem;
@@ -76,11 +78,17 @@
     
     .notification-card:hover {
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-color: var(--text-secondary);
     }
     
+    /* Cambio sutil para el modo oscuro en notificaciones no leídas */
     .notification-card.unread {
-        background: #F0F9FF;
-        border-left: 3px solid #0A66C2;
+        background: var(--lx-primary-light); 
+        border-left: 3px solid var(--lx-primary);
+    }
+    /* Para que en dark mode no sea tan brillante el azul claro */
+    html.dark-mode .notification-card.unread {
+        background: rgba(10, 102, 194, 0.1); 
     }
     
     .notification-avatar {
@@ -98,19 +106,19 @@
     .notification-title {
         font-size: 15px;
         font-weight: 600;
-        color: #111827;
+        color: var(--text-primary);
         margin-bottom: 0.25rem;
     }
     
     .notification-message {
         font-size: 14px;
-        color: #6b7280;
+        color: var(--text-secondary);
         margin-bottom: 0.5rem;
     }
     
     .notification-time {
         font-size: 12px;
-        color: #9ca3af;
+        color: var(--text-secondary);
     }
     
     .notification-actions {
@@ -126,17 +134,18 @@
         border: none;
         background: transparent;
         cursor: pointer;
-        color: #6b7280;
+        color: var(--text-secondary);
     }
     
     .btn-icon:hover {
-        background: #f3f4f6;
+        background: var(--bg-body);
+        color: var(--text-primary);
     }
     
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        color: #9ca3af;
+        color: var(--text-secondary);
     }
 </style>
 {% endblock %}
@@ -170,8 +179,8 @@
         {% if notif.emisor %}
         <img src="{{ notif.emisor.get_avatar_url }}" alt="Avatar" class="notification-avatar">
         {% else %}
-        <div class="notification-avatar" style="background: #E7F3FF; display: flex; align-items: center; justify-content: center;">
-            <i class="bi bi-bell-fill" style="color: #0A66C2; font-size: 20px;"></i>
+        <div class="notification-avatar" style="background: rgba(10, 102, 194, 0.1); display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-bell-fill" style="color: var(--lx-primary); font-size: 20px;"></i>
         </div>
         {% endif %}
         
@@ -202,11 +211,10 @@
     </div>
     {% endfor %}
     
-    <!-- Paginación -->
     {% if notificaciones.has_other_pages %}
-    <div class="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+    <div class="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; color: var(--text-primary);">
         {% if notificaciones.has_previous %}
-        <a href="?page={{ notificaciones.previous_page_number }}&filter={{ filter_type }}" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none;">
+        <a href="?page={{ notificaciones.previous_page_number }}&filter={{ filter_type }}" style="padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; color: var(--text-primary);">
             <i class="bi bi-chevron-left"></i>
         </a>
         {% endif %}
@@ -216,7 +224,7 @@
         </span>
         
         {% if notificaciones.has_next %}
-        <a href="?page={{ notificaciones.next_page_number }}&filter={{ filter_type }}" style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; text-decoration: none;">
+        <a href="?page={{ notificaciones.next_page_number }}&filter={{ filter_type }}" style="padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; color: var(--text-primary);">
             <i class="bi bi-chevron-right"></i>
         </a>
         {% endif %}
